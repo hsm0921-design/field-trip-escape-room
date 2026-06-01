@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대한민국 민주화운동 역사 퀴즈</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --accent: #f59e0b;
+    --success: #10b981;
+    --error: #ef4444;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── 헤더 ── */
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1d4ed8 100%);
+    color: white;
+    text-align: center;
+    padding: 48px 20px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '🇰🇷';
+    position: absolute;
+    font-size: 200px;
+    opacity: .05;
+    top: -20px; right: -20px;
+  }
+  .hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 8px; }
+  .hero p  { font-size: 1rem; opacity: .85; max-width: 560px; margin: 0 auto 20px; }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+    padding: 4px 16px;
+    font-size: .85rem;
+  }
+
+  /* ── 탭 네비 ── */
+  .tab-nav {
+    display: flex;
+    overflow-x: auto;
+    background: #1e3a5f;
+    gap: 2px;
+    padding: 0 12px;
+  }
+  .tab-btn {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.65);
+    padding: 14px 20px;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: white; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── 메인 레이아웃 ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 16px 60px; }
+
+  .decade-panel { display: none; }
+  .decade-panel.active { display: block; }
+
+  /* ── 시대 헤더 카드 ── */
+  .era-header {
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: center;
+  }
+  .era-1950 { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; }
+  .era-1960 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 5px solid #3b82f6; }
+  .era-1970 { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border-left: 5px solid #ec4899; }
+  .era-1980 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-left: 5px solid #10b981; }
+  .era-1990 { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-left: 5px solid #7c3aed; }
+
+  .era-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  .era-sub   { font-size: .95rem; color: var(--muted); }
+  .era-keyword {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+  }
+  .kw {
+    background: rgba(0,0,0,.08);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: .78rem;
+    font-weight: 600;
+  }
+  .era-img {
+    width: 110px; height: 110px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    flex-shrink: 0;
+  }
+
+  /* ── 인물 갤러리 ── */
+  .figure-gallery {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    margin-bottom: 24px;
+  }
+  .figure-card {
+    flex: 0 0 auto;
+    text-align: center;
+    width: 120px;
+  }
+  .figure-card img {
+    width: 100px; height: 110px;
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: top;
+    border: 3px solid var(--border);
+    display: block;
+    margin: 0 auto 6px;
+    background: #e2e8f0;
+  }
+  .figure-name { font-size: .8rem; font-weight: 700; }
+  .figure-desc { font-size: .72rem; color: var(--muted); line-height: 1.4; }
+
+  /* ── 역사 타임라인 ── */
+  .timeline {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .timeline h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: var(--primary); }
+  .tl-item {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .tl-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tl-year {
+    flex: 0 0 52px;
+    font-size: .82rem;
+    font-weight: 800;
+    color: var(--primary);
+    padding-top: 2px;
+  }
+  .tl-text { font-size: .9rem; }
+  .tl-heart { color: #ef4444; font-size: .8rem; }
+
+  /* ── 퀴즈 카드 ── */
+  .quiz-section h3 {
+    font-size: 1.1rem; font-weight: 800;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .quiz-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 16px;
+    transition: border-color .2s;
+  }
+  .quiz-card.answered { border-color: #c7d2fe; }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .q-num {
+    flex: 0 0 32px; height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: .85rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .q-text { font-size: 1rem; font-weight: 600; line-height: 1.55; }
+
+  .options { display: grid; gap: 8px; }
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f1f5f9;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all .18s;
+    width: 100%;
+  }
+  .opt-btn:hover:not(:disabled) { background: #e0e7ff; border-color: var(--primary); }
+  .opt-btn.correct { background: #d1fae5; border-color: var(--success); color: #065f46; }
+  .opt-btn.wrong   { background: #fee2e2; border-color: var(--error);   color: #991b1b; }
+  .opt-btn:disabled { cursor: default; }
+  .opt-mark { flex: 0 0 20px; height: 20px; border-radius: 50%;
+    background: #cbd5e1; font-size: .7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; }
+  .opt-btn.correct .opt-mark { background: var(--success); color: white; }
+  .opt-btn.wrong   .opt-mark { background: var(--error);   color: white; }
+
+  .explanation {
+    margin-top: 14px;
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    font-size: .88rem;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation .label { font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+
+  /* ── 점수판 ── */
+  .score-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .score-text { font-size: .95rem; }
+  .score-count { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+  .score-progress {
+    flex: 1;
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
+    transition: width .4s;
+  }
+
+  .reset-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .reset-btn:hover { background: #1d4ed8; }
+
+  /* ── 마무리 메시지 ── */
+  .outro {
+    background: linear-gradient(135deg, #1e3a5f, #2563eb);
+    color: white;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    margin-top: 40px;
+  }
+  .outro h2 { font-size: 1.4rem; margin-bottom: 10px; }
+  .outro p  { opacity: .85; font-size: .95rem; max-width: 500px; margin: 0 auto; }
+
+  /* 반응형 */
+  @media(max-width:600px) {
+    .era-header { grid-template-columns: 1fr; }
+    .era-img { width: 80px; height: 80px; justify-self: end; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="hero">
+  <h1>🕊️ 대한민국 민주화운동 역사 퀴즈</h1>
+  <p>1950년대부터 지금까지, 평범한 시민들이 일구어 낸 민주주의의 역사를 퀴즈로 알아보아요.</p>
+  <span class="badge">중학교 1학년 | 역사 | 총 25문제</span>
+</div>
+
+<!-- 탭 네비게이션 -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showDecade('d1950',this)">📜 1950년대</button>
+  <button class="tab-btn" onclick="showDecade('d1960',this)">✊ 1960년대</button>
+  <button class="tab-btn" onclick="showDecade('d1970',this)">🔥 1970년대</button>
+  <button class="tab-btn" onclick="showDecade('d1980',this)">🌸 1980년대</button>
+  <button class="tab-btn" onclick="showDecade('d1990',this)">🗳️ 1990년대~</button>
+</nav>
+
+<div class="container">
+
+<!-- ───────────── 1950년대 ───────────── -->
+<div id="d1950" class="decade-panel active">
+  <div class="era-header era-1950">
+    <div>
+      <div class="era-title">📜 1950년대 — 독재의 시작</div>
+      <div class="era-sub">이승만 정부의 장기집권 시도와 부정선거, 그리고 시민들의 첫 저항</div>
+      <div class="era-keyword">
+        <span class="kw">이승만</span><span class="kw">발췌개헌</span>
+        <span class="kw">사사오입 개헌</span><span class="kw">3·15 부정선거</span>
+      </div>
+    </div>
+    <img class="era-img"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Syngman_Rhee.jpg/440px-Syngman_Rhee.jpg"
+      alt="이승만" onerror="this.style.display='none'">
+  </div>
+
+  <div class="figure-gallery">
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Syngman_Rhee.jpg/440px-Syngman_Rhee.jpg" alt="이승만" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2224%22>👤</text></svg>'">
+      <div class="figure-name">이승만</div>
+      <div class="figure-desc">초대 대통령<br>장기집권 시도</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23dbeafe' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%232563eb' font-size='40'>📜</text><text y='80' x='50' text-anchor='middle' fill='%231e40af' font-size='11'>발췌개헌</text></svg>" alt="발췌개헌">
+      <div class="figure-name">1952년</div>
+      <div class="figure-desc">발췌개헌<br>직선제 강행</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fef3c7' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23d97706' font-size='40'>✏️</text><text y='80' x='50' text-anchor='middle' fill='%2392400e' font-size='10'>사사오입개헌</text></svg>" alt="사사오입개헌">
+      <div class="figure-name">1954년</div>
+      <div class="figure-desc">사사오입 개헌<br>수학 오류로 통과</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fce7f3' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23be185d' font-size='40'>🗳️</text><text y='80' x='50' text-anchor='middle' fill='%23831843' font-size='10'>3·15 부정선거</text></svg>" alt="부정선거">
+      <div class="figure-name">1960년</div>
+      <div class="figure-desc">3·15 부정선거<br>민주주의 위기</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h3>📌 주요 역사 흐름</h3>
+    <div class="tl-item">
+      <div class="tl-year">1948</div>
+      <div class="tl-text">이승만, 초대 대통령 취임 — 대한민국 정부 수립</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1952</div>
+      <div class="tl-text"><strong>발췌개헌</strong> — 전쟁 중 부산에서 대통령 직선제로 헌법을 강제 개정. 국회의원을 협박·감금하며 통과시킴</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1954</div>
+      <div class="tl-text"><strong>사사오입 개헌</strong> — 이승만의 3선 금지를 없애기 위해 135.33표를 "반올림하면 135"라며 억지로 개헌 통과</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1960.3.15</div>
+      <div class="tl-text"><strong>3·15 부정선거</strong> — 투표함 바꿔치기, 3인조·9인조 공개 투표 강요. <span class="tl-heart">✦ 이 분노가 4·19 혁명을 불렀습니다</span></div>
+    </div>
+  </div>
+
+  <div class="score-bar" id="score1950">
+    <div>
+      <div class="score-text">맞힌 문제</div>
+      <div class="score-count" id="cnt1950">0 / 5</div>
+    </div>
+    <div class="score-progress"><div class="score-fill" id="fill1950" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetDecade('d1950')">다시 풀기</button>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 1950년대 퀴즈 — 5문제</h3>
+
+    <div class="quiz-card" id="q1950_1">
+      <div class="q-header">
+        <div class="q-num">1</div>
+        <div class="q-text">1952년, 이승만 대통령이 6·25 전쟁 중에 대통령 선출 방식을 국회 간선제에서 <strong>국민이 직접 뽑는 방식</strong>으로 바꾼 헌법 개정을 무엇이라고 하나요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1950_1',false,'1950')"><span class="opt-mark">①</span> 사사오입 개헌</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_1',true,'1950')"><span class="opt-mark">②</span> 발췌개헌</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_1',false,'1950')"><span class="opt-mark">③</span> 유신헌법</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_1',false,'1950')"><span class="opt-mark">④</span> 제헌헌법</button>
+      </div>
+      <div class="explanation" id="exp_q1950_1">
+        <div class="label">💡 해설</div>
+        발췌개헌(1952)은 전쟁 중 부산에서 강행되었어요. 국회 간선제로는 재선이 어렵다고 판단한 이승만이, 국회의원을 협박·감금하면서까지 직선제 헌법을 만들었습니다. 민주주의의 절차를 무시한 첫 번째 큰 사건이에요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1950_2">
+      <div class="q-header">
+        <div class="q-num">2</div>
+        <div class="q-text">1954년, 이승만이 <strong>대통령 3선 제한 조항</strong>을 없애기 위해 개헌안을 통과시켰습니다. 찬성표가 135.33표였는데, 반올림하면 135표라며 통과를 선언한 이 황당한 사건의 이름은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1950_2',false,'1950')"><span class="opt-mark">①</span> 발췌개헌</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_2',false,'1950')"><span class="opt-mark">②</span> 유신 개헌</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_2',true,'1950')"><span class="opt-mark">③</span> 사사오입 개헌</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_2',false,'1950')"><span class="opt-mark">④</span> 내각제 개헌</button>
+      </div>
+      <div class="explanation" id="exp_q1950_2">
+        <div class="label">💡 해설</div>
+        사사오입(四捨五入)이란 '반올림'이라는 뜻이에요. 재적 의원 203명의 2/3는 135.33명인데, 정족수 136표에 1표가 부족해 부결을 선언했다가 하루 뒤 "0.33은 버리면 135"라고 강행 통과했습니다. 수학을 정치에 이용한 황당한 사례입니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1950_3">
+      <div class="q-header">
+        <div class="q-num">3</div>
+        <div class="q-text">1960년 3월 15일, 이승만 정권이 대규모 부정선거를 저질렀습니다. 다음 중 당시 <strong>실제로 있었던 부정선거 방법</strong>이 아닌 것은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1950_3',false,'1950')"><span class="opt-mark">①</span> 미리 기표된 투표용지를 투표함에 넣음</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_3',false,'1950')"><span class="opt-mark">②</span> 3인조·9인조로 묶어 공개 투표를 강요</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_3',true,'1950')"><span class="opt-mark">③</span> 투표 연령을 20세에서 25세로 높임</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_3',false,'1950')"><span class="opt-mark">④</span> 야당 참관인을 투표소에서 쫓아냄</button>
+      </div>
+      <div class="explanation" id="exp_q1950_3">
+        <div class="label">💡 해설</div>
+        투표 연령을 높인 것은 부정선거 방법이 아니에요. 당시에는 ①②④처럼 아주 노골적인 방법으로 선거를 조작했습니다. 국민들은 이에 크게 분노해 마산을 시작으로 전국에서 항의 시위가 일어났어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1950_4">
+      <div class="q-header">
+        <div class="q-num">4</div>
+        <div class="q-text">3·15 부정선거에 항의하며 마산에서 시위에 참여했다가 실종된 뒤, 눈에 최루탄이 박힌 채 발견되어 <strong>4·19 혁명의 불씨</strong>가 된 17세 학생은 누구인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1950_4',false,'1950')"><span class="opt-mark">①</span> 전태일</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_4',false,'1950')"><span class="opt-mark">②</span> 이한열</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_4',true,'1950')"><span class="opt-mark">③</span> 김주열</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_4',false,'1950')"><span class="opt-mark">④</span> 박종철</button>
+      </div>
+      <div class="explanation" id="exp_q1950_4">
+        <div class="label">💡 해설</div>
+        김주열 열사(1943~1960)는 마산에서 시위 중 실종되었다가, 한 달 뒤 눈에 최루탄이 박힌 채 마산 앞바다에서 발견되었어요. 이 충격적인 소식이 전국에 퍼지며 4·19 혁명으로 이어졌습니다. 그의 나이 불과 17세였어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1950_5">
+      <div class="q-header">
+        <div class="q-num">5</div>
+        <div class="q-text">1950년대 이승만 정권에서 반복된 헌법 개정의 공통점은 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1950_5',false,'1950')"><span class="opt-mark">①</span> 국민의 기본권을 더 많이 보장하기 위해서</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_5',true,'1950')"><span class="opt-mark">②</span> 이승만 대통령이 계속 권력을 유지하기 위해서</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_5',false,'1950')"><span class="opt-mark">③</span> 국회의 권한을 강화하기 위해서</button>
+        <button class="opt-btn" onclick="answer(this,'q1950_5',false,'1950')"><span class="opt-mark">④</span> 전쟁 이후 나라를 빠르게 재건하기 위해서</button>
+      </div>
+      <div class="explanation" id="exp_q1950_5">
+        <div class="label">💡 해설</div>
+        발췌개헌(1952)과 사사오입 개헌(1954) 모두 이승만이 계속 대통령 자리에 머물기 위한 것이었어요. 민주주의에서 헌법은 국민을 위한 것인데, 이승만은 헌법을 자신의 권력 유지 도구로 이용했습니다. 이것이 바로 독재의 시작이었어요.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ───────────── 1960년대 ───────────── -->
+<div id="d1960" class="decade-panel">
+  <div class="era-header era-1960">
+    <div>
+      <div class="era-title">✊ 1960년대 — 4·19 혁명과 5·16 군사쿠데타</div>
+      <div class="era-sub">학생과 시민이 독재를 무너뜨렸지만, 군인이 총칼로 민주주의를 다시 빼앗아 갔습니다</div>
+      <div class="era-keyword">
+        <span class="kw">4·19 혁명</span><span class="kw">5·16 군사쿠데타</span>
+        <span class="kw">박정희</span><span class="kw">한일협정 반대</span>
+      </div>
+    </div>
+    <img class="era-img"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Park_Chung-hee_portrait.jpg/440px-Park_Chung-hee_portrait.jpg"
+      alt="박정희" onerror="this.style.display='none'">
+  </div>
+
+  <div class="figure-gallery">
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23dbeafe' width='100' height='110'/><text y='60' x='50' text-anchor='middle' fill='%231e40af' font-size='50'>✊</text><text y='90' x='50' text-anchor='middle' fill='%231e40af' font-size='11'>4·19 혁명</text></svg>" alt="4·19혁명">
+      <div class="figure-name">4·19 혁명</div>
+      <div class="figure-desc">1960.4.19<br>학생·시민 봉기</div>
+    </div>
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Park_Chung-hee_portrait.jpg/440px-Park_Chung-hee_portrait.jpg" alt="박정희" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2224%22>👤</text></svg>'">
+      <div class="figure-name">박정희</div>
+      <div class="figure-desc">5·16 쿠데타<br>18년 집권</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fce7f3' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23be185d' font-size='40'>📋</text><text y='80' x='50' text-anchor='middle' fill='%23831843' font-size='10'>한일협정 반대</text></svg>" alt="한일협정">
+      <div class="figure-name">1964년</div>
+      <div class="figure-desc">6·3 항쟁<br>한일협정 반대</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23d1fae5' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23065f46' font-size='40'>🏫</text><text y='80' x='50' text-anchor='middle' fill='%23065f46' font-size='10'>학생들의 저항</text></svg>" alt="학생시위">
+      <div class="figure-name">대학생들</div>
+      <div class="figure-desc">민주화의<br>주역</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h3>📌 주요 역사 흐름</h3>
+    <div class="tl-item">
+      <div class="tl-year">1960.4.19</div>
+      <div class="tl-text"><strong>4·19 혁명</strong> — 학생·시민들이 부정선거에 항의. 경찰 총격으로 185명 사망. 이승만 대통령 결국 하야 <span class="tl-heart">✦ 시민의 힘으로 독재를 무너뜨림</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1961.5.16</div>
+      <div class="tl-text"><strong>5·16 군사쿠데타</strong> — 박정희 장군이 군대를 동원해 민주 정부를 무너뜨림. 총칼로 민주주의를 빼앗아 감</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1964</div>
+      <div class="tl-text"><strong>6·3 항쟁</strong> — 박정희 정부의 굴욕적 한일 협정에 반대하는 학생·시민 시위. 계엄령으로 진압</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1969</div>
+      <div class="tl-text"><strong>3선 개헌</strong> — 박정희, 대통령 3선 금지 조항을 없애기 위해 국민투표로 헌법 개정</div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div>
+      <div class="score-text">맞힌 문제</div>
+      <div class="score-count" id="cnt1960">0 / 5</div>
+    </div>
+    <div class="score-progress"><div class="score-fill" id="fill1960" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetDecade('d1960')">다시 풀기</button>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 1960년대 퀴즈 — 5문제</h3>
+
+    <div class="quiz-card" id="q1960_1">
+      <div class="q-header">
+        <div class="q-num">1</div>
+        <div class="q-text">1960년 4월 19일, 학생과 시민들이 이승만의 독재와 부정선거에 항의하여 일어난 혁명은 무엇인가요? 이 혁명으로 이승만은 대통령 자리에서 물러났습니다.</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1960_1',false,'1960')"><span class="opt-mark">①</span> 5·18 민주화운동</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_1',true,'1960')"><span class="opt-mark">②</span> 4·19 혁명</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_1',false,'1960')"><span class="opt-mark">③</span> 6·10 민주항쟁</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_1',false,'1960')"><span class="opt-mark">④</span> 부마 항쟁</button>
+      </div>
+      <div class="explanation" id="exp_q1960_1">
+        <div class="label">💡 해설</div>
+        4·19 혁명(1960)은 대학생들과 고등학생, 그리고 일반 시민들이 함께 일으킨 민주주의 혁명이에요. 3·15 부정선거가 직접적인 원인이었고, 경찰의 총격으로 185명이 목숨을 잃었어요. 결국 이승만은 하야(자리에서 물러남)했습니다. 시민의 힘으로 독재를 무너뜨린 자랑스러운 역사입니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1960_2">
+      <div class="q-header">
+        <div class="q-num">2</div>
+        <div class="q-text">4·19 혁명으로 민주주의가 회복되었지만, 1961년 5월 16일 <strong>군인들이 탱크와 군대를 동원해 정권을 빼앗는</strong> 사건이 일어났습니다. 이 사건의 이름은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1960_2',false,'1960')"><span class="opt-mark">①</span> 5·18 광주 민주화운동</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_2',false,'1960')"><span class="opt-mark">②</span> 6·25 전쟁</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_2',true,'1960')"><span class="opt-mark">③</span> 5·16 군사쿠데타</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_2',false,'1960')"><span class="opt-mark">④</span> 10·26 사태</button>
+      </div>
+      <div class="explanation" id="exp_q1960_2">
+        <div class="label">💡 해설</div>
+        5·16 군사쿠데타(1961)는 박정희 장군이 군대를 이끌고 합법적인 정부를 무너뜨린 사건이에요. 시민들이 4·19로 힘들게 되찾은 민주주의가 1년 만에 군인에게 빼앗겼습니다. 쿠데타(coup d'état)는 무력으로 정권을 탈취하는 것을 말해요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1960_3">
+      <div class="q-header">
+        <div class="q-num">3</div>
+        <div class="q-text">4·19 혁명 당시 전국에서 수십 명의 학생과 시민이 경찰의 총격으로 목숨을 잃었습니다. 민주주의를 위한 희생이 얼마나 컸는지 보여주는 사실입니다. 4·19 혁명에서 사망한 사람의 수는 약 몇 명인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1960_3',false,'1960')"><span class="opt-mark">①</span> 약 10명</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_3',false,'1960')"><span class="opt-mark">②</span> 약 50명</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_3',true,'1960')"><span class="opt-mark">③</span> 약 185명</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_3',false,'1960')"><span class="opt-mark">④</span> 약 500명</button>
+      </div>
+      <div class="explanation" id="exp_q1960_3">
+        <div class="label">💡 해설</div>
+        4·19 혁명에서 경찰의 총격으로 약 185명이 사망하고 6,000여 명이 부상당했어요. 그 중에는 초등학생도 있었습니다. 민주주의는 그냥 얻어지는 것이 아니라, 많은 사람들의 용기와 희생으로 지켜진다는 것을 기억해야 해요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1960_4">
+      <div class="q-header">
+        <div class="q-num">4</div>
+        <div class="q-text">1964년 박정희 정부가 일본과 맺으려 한 협정에 반대하는 대규모 시위가 일어났습니다. 학생들은 "굴욕 외교 반대!"를 외쳤는데, 이 협정은 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1960_4',false,'1960')"><span class="opt-mark">①</span> 한미 상호방위조약</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_4',true,'1960')"><span class="opt-mark">②</span> 한일 기본조약(한일협정)</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_4',false,'1960')"><span class="opt-mark">③</span> 제네바 협정</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_4',false,'1960')"><span class="opt-mark">④</span> UN 가입 협정</button>
+      </div>
+      <div class="explanation" id="exp_q1960_4">
+        <div class="label">💡 해설</div>
+        1965년 체결된 한일 기본조약(한일협정)에 반대하는 6·3 항쟁(1964)이 일어났어요. 일제강점기에 대한 사과와 배상이 제대로 이루어지지 않은 채 협정이 추진되자, 대학생들이 "굴욕 외교 반대!"를 외치며 시위를 벌였습니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1960_5">
+      <div class="q-header">
+        <div class="q-num">5</div>
+        <div class="q-text">4·19 혁명의 의의로 가장 적절한 것은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1960_5',false,'1960')"><span class="opt-mark">①</span> 군인이 정치에 참여할 수 있는 길을 열었다</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_5',false,'1960')"><span class="opt-mark">②</span> 대한민국이 처음으로 독립한 사건이다</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_5',true,'1960')"><span class="opt-mark">③</span> 학생과 시민의 힘으로 독재 정권을 무너뜨린 최초의 민주주의 혁명이다</button>
+        <button class="opt-btn" onclick="answer(this,'q1960_5',false,'1960')"><span class="opt-mark">④</span> 대한민국이 처음으로 경제 발전을 이룬 사건이다</button>
+      </div>
+      <div class="explanation" id="exp_q1960_5">
+        <div class="label">💡 해설</div>
+        4·19 혁명은 학생과 시민이 주도하여 독재 정권을 무너뜨린 대한민국 최초의 민주주의 혁명이에요. 국민이 주권을 직접 행사할 수 있다는 것을 보여주었고, 이후 모든 민주화 운동의 정신적 뿌리가 되었습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ───────────── 1970년대 ───────────── -->
+<div id="d1970" class="decade-panel">
+  <div class="era-header era-1970">
+    <div>
+      <div class="era-title">🔥 1970년대 — 유신독재와 민중의 저항</div>
+      <div class="era-sub">박정희의 영구 집권 시도, 노동자 전태일의 분신, 부마 항쟁의 불꽃</div>
+      <div class="era-keyword">
+        <span class="kw">유신헌법</span><span class="kw">전태일</span>
+        <span class="kw">긴급조치</span><span class="kw">부마항쟁</span>
+      </div>
+    </div>
+    <img class="era-img"
+      src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect fill='%23fce7f3' width='120' height='120' rx='12'/><text y='70' x='60' text-anchor='middle' fill='%23be185d' font-size='60'>🔥</text></svg>"
+      alt="1970s">
+  </div>
+
+  <div class="figure-gallery">
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Jeon_Tae-il.jpg/440px-Jeon_Tae-il.jpg" alt="전태일" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23fee2e2%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%23ef4444%22 font-size=%2224%22>🔥</text></svg>'">
+      <div class="figure-name">전태일 열사</div>
+      <div class="figure-desc">노동자 인권<br>1970년 분신</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fce7f3' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23be185d' font-size='36'>📜</text><text y='80' x='50' text-anchor='middle' fill='%23831843' font-size='10'>유신헌법</text></svg>" alt="유신헌법">
+      <div class="figure-name">유신헌법</div>
+      <div class="figure-desc">1972년<br>영구집권 시도</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fff7ed' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23c2410c' font-size='36'>⚡</text><text y='80' x='50' text-anchor='middle' fill='%23c2410c' font-size='10'>긴급조치</text></svg>" alt="긴급조치">
+      <div class="figure-name">긴급조치</div>
+      <div class="figure-desc">헌법 비판도<br>금지</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23ede9fe' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%237c3aed' font-size='36'>🌊</text><text y='80' x='50' text-anchor='middle' fill='%235b21b6' font-size='10'>부마항쟁</text></svg>" alt="부마항쟁">
+      <div class="figure-name">부마 항쟁</div>
+      <div class="figure-desc">1979년<br>부산·마산</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h3>📌 주요 역사 흐름</h3>
+    <div class="tl-item">
+      <div class="tl-year">1970.11</div>
+      <div class="tl-text"><strong>전태일 분신</strong> — "근로기준법을 지켜라!" 22세 청년 재단사 전태일이 노동자 인권을 위해 스스로 목숨을 바침. 노동운동의 불씨 <span class="tl-heart">✦</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1972</div>
+      <div class="tl-text"><strong>유신헌법</strong> — 박정희가 헌법을 고쳐 대통령을 국민이 아닌 통일주체국민회의에서 선출. 사실상 영구 집권 시도</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1974~</div>
+      <div class="tl-text"><strong>긴급조치</strong> — 유신헌법을 비판하거나 개헌을 주장하면 최고 사형까지 처벌. 표현의 자유를 완전히 짓밟음</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1979.10</div>
+      <div class="tl-text"><strong>부마 항쟁</strong> — 부산·마산 시민들의 대규모 반독재 시위. 10·26 사태로 박정희 사망하며 유신 체제 붕괴 <span class="tl-heart">✦</span></div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div>
+      <div class="score-text">맞힌 문제</div>
+      <div class="score-count" id="cnt1970">0 / 5</div>
+    </div>
+    <div class="score-progress"><div class="score-fill" id="fill1970" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetDecade('d1970')">다시 풀기</button>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 1970년대 퀴즈 — 5문제</h3>
+
+    <div class="quiz-card" id="q1970_1">
+      <div class="q-header">
+        <div class="q-num">1</div>
+        <div class="q-text">1970년 11월 22세 청년 재단사가 "근로기준법을 지켜라!"라고 외치며 분신하여 노동자 인권 운동에 큰 불씨를 남겼습니다. 이 분은 누구인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1970_1',false,'1970')"><span class="opt-mark">①</span> 김주열</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_1',true,'1970')"><span class="opt-mark">②</span> 전태일</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_1',false,'1970')"><span class="opt-mark">③</span> 이한열</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_1',false,'1970')"><span class="opt-mark">④</span> 박종철</button>
+      </div>
+      <div class="explanation" id="exp_q1970_1">
+        <div class="label">💡 해설</div>
+        전태일 열사(1948~1970)는 서울 평화시장에서 일하는 재단사였어요. 하루 14~16시간 일하고도 너무 적은 돈을 받는 어린 노동자들을 보며 노동법 개선을 요구했지만 무시당했습니다. 결국 "우리는 기계가 아니다!"라는 외침과 함께 22세의 나이에 분신하였고, 한국 노동운동의 역사를 바꾸었습니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1970_2">
+      <div class="q-header">
+        <div class="q-num">2</div>
+        <div class="q-text">1972년 박정희가 선포한 <strong>유신헌법</strong>의 가장 큰 특징은 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1970_2',false,'1970')"><span class="opt-mark">①</span> 대통령 임기를 5년으로 제한했다</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_2',true,'1970')"><span class="opt-mark">②</span> 국민이 대통령을 직접 뽑을 수 없게 하고, 박정희의 영구 집권을 가능하게 했다</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_2',false,'1970')"><span class="opt-mark">③</span> 국회의 권한을 크게 강화했다</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_2',false,'1970')"><span class="opt-mark">④</span> 언론의 자유를 헌법으로 보장했다</button>
+      </div>
+      <div class="explanation" id="exp_q1970_2">
+        <div class="label">💡 해설</div>
+        유신헌법(1972)은 대통령을 국민이 아닌 '통일주체국민회의'에서 간접 선출하게 하고, 대통령에게 국회해산권, 긴급조치권 등 막강한 권한을 주었어요. 임기 제한도 없앴습니다. 사실상 박정희의 독재를 합법화한 헌법이었어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1970_3">
+      <div class="q-header">
+        <div class="q-num">3</div>
+        <div class="q-text">유신 시대에 박정희 정권이 민주주의를 요구하는 시민을 탄압하기 위해 자주 발동했던 것으로, <strong>"유신헌법을 비판하면 처벌한다"</strong>는 내용을 담은 것은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1970_3',false,'1970')"><span class="opt-mark">①</span> 계엄령 선포</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_3',true,'1970')"><span class="opt-mark">②</span> 긴급조치</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_3',false,'1970')"><span class="opt-mark">③</span> 통행금지령</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_3',false,'1970')"><span class="opt-mark">④</span> 위수령</button>
+      </div>
+      <div class="explanation" id="exp_q1970_3">
+        <div class="label">💡 해설</div>
+        긴급조치는 박정희가 유신헌법에 따라 발동할 수 있는 특별 명령이에요. 1974년부터 여러 차례 발동되어 유신헌법 비판, 개헌 청원, 민주화 요구 등을 모두 금지하고 체포·구금할 수 있게 했습니다. 많은 학생, 교수, 기자들이 이 조치로 감옥에 갔어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1970_4">
+      <div class="q-header">
+        <div class="q-num">4</div>
+        <div class="q-text">1979년 10월, 부산과 마산 시민들이 유신 독재에 저항한 대규모 항쟁이 일어났습니다. 이 항쟁의 이름은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1970_4',false,'1970')"><span class="opt-mark">①</span> 6·3 항쟁</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_4',false,'1970')"><span class="opt-mark">②</span> 4·19 혁명</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_4',true,'1970')"><span class="opt-mark">③</span> 부마 항쟁</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_4',false,'1970')"><span class="opt-mark">④</span> 6·10 민주항쟁</button>
+      </div>
+      <div class="explanation" id="exp_q1970_4">
+        <div class="label">💡 해설</div>
+        부마 항쟁(1979.10)은 부산(釜)과 마산(馬)에서 일어난 민중 항쟁이에요. "유신 철폐!", "독재 타도!"를 외치며 수만 명이 거리로 나왔습니다. 이 항쟁은 유신 체제의 위기를 불러왔고, 같은 달 박정희가 측근에게 피격되어 사망(10·26 사태)하면서 18년간의 유신 독재가 끝났습니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1970_5">
+      <div class="q-header">
+        <div class="q-num">5</div>
+        <div class="q-text">전태일 열사가 요구한 것은 무엇이었나요? (핵심 내용)</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1970_5',false,'1970')"><span class="opt-mark">①</span> 대통령을 직접 선거로 뽑자</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_5',true,'1970')"><span class="opt-mark">②</span> 노동자들의 근로 조건과 인권을 법대로 보장하라</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_5',false,'1970')"><span class="opt-mark">③</span> 한일협정을 취소하라</button>
+        <button class="opt-btn" onclick="answer(this,'q1970_5',false,'1970')"><span class="opt-mark">④</span> 군사정권을 무너뜨리자</button>
+      </div>
+      <div class="explanation" id="exp_q1970_5">
+        <div class="label">💡 해설</div>
+        전태일 열사는 정치적 요구보다 노동자들의 기본 권리를 요구했어요. 하루 16시간 이상 일하고, 어린 여공들이 폐결핵에 걸리는 열악한 환경에서 "근로기준법을 준수하라!"고 외쳤습니다. 그의 희생은 한국 노동운동의 역사를 바꾸었고, 지금 우리가 누리는 노동 권리의 기반이 되었어요.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ───────────── 1980년대 ───────────── -->
+<div id="d1980" class="decade-panel">
+  <div class="era-header era-1980">
+    <div>
+      <div class="era-title">🌸 1980년대 — 광주의 봄과 6월 항쟁</div>
+      <div class="era-sub">군부 독재에 맞선 광주 시민들의 저항, 그리고 전 국민이 하나 된 6·10 민주항쟁</div>
+      <div class="era-keyword">
+        <span class="kw">5·18 광주</span><span class="kw">전두환</span>
+        <span class="kw">이한열</span><span class="kw">6·10 민주항쟁</span>
+      </div>
+    </div>
+    <img class="era-img"
+      src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect fill='%23d1fae5' width='120' height='120' rx='12'/><text y='70' x='60' text-anchor='middle' fill='%23065f46' font-size='60'>🌸</text></svg>"
+      alt="1980s">
+  </div>
+
+  <div class="figure-gallery">
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23d1fae5' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23065f46' font-size='40'>🌸</text><text y='80' x='50' text-anchor='middle' fill='%23065f46' font-size='10'>5·18 광주</text></svg>" alt="광주민주화운동">
+      <div class="figure-name">5·18 광주</div>
+      <div class="figure-desc">1980.5.18<br>시민들의 항쟁</div>
+    </div>
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Lee_Han-yeol_1987.jpg/440px-Lee_Han-yeol_1987.jpg" alt="이한열" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23fee2e2%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%23ef4444%22 font-size=%2224%22>🎓</text></svg>'">
+      <div class="figure-name">이한열 열사</div>
+      <div class="figure-desc">연세대 학생<br>1987년 희생</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fce7f3' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23be185d' font-size='40'>💧</text><text y='80' x='50' text-anchor='middle' fill='%23831843' font-size='10'>박종철 열사</text></svg>" alt="박종철">
+      <div class="figure-name">박종철 열사</div>
+      <div class="figure-desc">고문으로 희생<br>1987년</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23eff6ff' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%232563eb' font-size='40'>✊</text><text y='80' x='50' text-anchor='middle' fill='%231e40af' font-size='10'>6·10 항쟁</text></svg>" alt="6·10항쟁">
+      <div class="figure-name">6·10 민주항쟁</div>
+      <div class="figure-desc">100만 시민<br>거리로</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h3>📌 주요 역사 흐름</h3>
+    <div class="tl-item">
+      <div class="tl-year">1980.5.18</div>
+      <div class="tl-text"><strong>5·18 광주 민주화운동</strong> — 전두환 신군부에 맞선 광주 시민들. 계엄군의 총칼에 맞서 열흘간 항쟁. 200여 명 이상 사망 <span class="tl-heart">✦</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1987.1</div>
+      <div class="tl-text"><strong>박종철 고문 사망</strong> — 서울대생 박종철이 경찰 조사 중 물고문으로 사망. "책상을 탁 치니 억 하고 죽었다"는 거짓 발표로 국민 분노 폭발 <span class="tl-heart">✦</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1987.6.9</div>
+      <div class="tl-text"><strong>이한열 피격</strong> — 연세대생 이한열이 시위 중 직격 최루탄에 맞아 쓰러짐. 한 달 뒤 사망</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1987.6.10</div>
+      <div class="tl-text"><strong>6·10 민주항쟁</strong> — 전국 18개 도시, 100만 명 이상이 "독재 타도, 직선제 개헌"을 외침 <span class="tl-heart">✦ 결국 6·29 선언으로 대통령 직선제 쟁취!</span></div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div>
+      <div class="score-text">맞힌 문제</div>
+      <div class="score-count" id="cnt1980">0 / 5</div>
+    </div>
+    <div class="score-progress"><div class="score-fill" id="fill1980" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetDecade('d1980')">다시 풀기</button>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 1980년대 퀴즈 — 5문제</h3>
+
+    <div class="quiz-card" id="q1980_1">
+      <div class="q-header">
+        <div class="q-num">1</div>
+        <div class="q-text">1980년 5월 18일, 전두환 신군부의 쿠데타와 계엄 확대에 맞서 항쟁을 벌인 도시는 어디인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1980_1',false,'1980')"><span class="opt-mark">①</span> 서울</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_1',false,'1980')"><span class="opt-mark">②</span> 부산</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_1',true,'1980')"><span class="opt-mark">③</span> 광주</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_1',false,'1980')"><span class="opt-mark">④</span> 대구</button>
+      </div>
+      <div class="explanation" id="exp_q1980_1">
+        <div class="label">💡 해설</div>
+        5·18 광주 민주화운동(1980)은 전남 광주에서 일어났어요. 전두환이 이끄는 신군부가 정권을 장악하고 계엄령을 전국으로 확대하자, 광주 시민과 학생들이 저항했습니다. 계엄군은 시민들에게 총을 겨누었고, 이 항쟁에서 200여 명 이상이 목숨을 잃었어요. 2011년 유네스코 세계기록유산에 등재되었습니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1980_2">
+      <div class="q-header">
+        <div class="q-num">2</div>
+        <div class="q-text">1987년 1월, 경찰의 물고문으로 사망한 서울대학교 학생 이름은? 그의 죽음이 알려지며 국민들의 분노가 폭발해 6월 민주항쟁의 도화선이 되었습니다.</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1980_2',false,'1980')"><span class="opt-mark">①</span> 이한열</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_2',true,'1980')"><span class="opt-mark">②</span> 박종철</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_2',false,'1980')"><span class="opt-mark">③</span> 전태일</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_2',false,'1980')"><span class="opt-mark">④</span> 김주열</button>
+      </div>
+      <div class="explanation" id="exp_q1980_2">
+        <div class="label">💡 해설</div>
+        박종철 열사(1964~1987)는 서울대 언어학과 학생으로, 경찰 조사 도중 물고문으로 사망했어요. 경찰은 "책상을 탁 치니 억 하고 죽었다"며 거짓말했지만, 진실이 밝혀지며 국민 분노가 폭발했습니다. 그의 죽음이 6월 민주항쟁의 직접적인 불씨가 되었어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1980_3">
+      <div class="q-header">
+        <div class="q-num">3</div>
+        <div class="q-text">1987년 6월 항쟁 직전, 시위 도중 직격 최루탄을 맞고 쓰러진 연세대학교 학생은 누구인가요? 이 사진은 6월 항쟁의 상징이 되었습니다.</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1980_3',false,'1980')"><span class="opt-mark">①</span> 박종철</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_3',false,'1980')"><span class="opt-mark">②</span> 전태일</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_3',true,'1980')"><span class="opt-mark">③</span> 이한열</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_3',false,'1980')"><span class="opt-mark">④</span> 김주열</button>
+      </div>
+      <div class="explanation" id="exp_q1980_3">
+        <div class="label">💡 해설</div>
+        이한열 열사(1966~1987)는 연세대학교 경영학과 2학년 학생으로, 6월 항쟁 직전 시위 도중 최루탄에 맞아 쓰러졌어요. 친구에게 안겨 쓰러지는 사진은 전 세계에 알려지며 민주화 운동의 상징이 되었습니다. 한 달 뒤 21세의 나이로 세상을 떠났어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1980_4">
+      <div class="q-header">
+        <div class="q-num">4</div>
+        <div class="q-text">1987년 6·10 민주항쟁의 핵심 요구 사항은 무엇이었나요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1980_4',false,'1980')"><span class="opt-mark">①</span> 국회의원 임기를 줄여라</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_4',true,'1980')"><span class="opt-mark">②</span> 대통령을 국민이 직접 뽑는 직선제로 바꿔라</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_4',false,'1980')"><span class="opt-mark">③</span> 군인은 정치에 참여할 수 없게 해라</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_4',false,'1980')"><span class="opt-mark">④</span> 대통령 임기를 4년으로 늘려라</button>
+      </div>
+      <div class="explanation" id="exp_q1980_4">
+        <div class="label">💡 해설</div>
+        "호헌 철폐! 직선제 개헌!" — 6월 항쟁의 구호예요. 전두환 정권은 대통령 선거인단이 대통령을 뽑는 간선제를 고집했어요. 국민들은 내 손으로 직접 대통령을 뽑을 권리를 요구했고, 6월 항쟁으로 결국 6·29 민주화 선언을 이끌어내 직선제를 쟁취했습니다.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1980_5">
+      <div class="q-header">
+        <div class="q-num">5</div>
+        <div class="q-text">5·18 광주 민주화운동이 중요한 역사적 의의를 가지는 이유로 가장 적절한 것은?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1980_5',false,'1980')"><span class="opt-mark">①</span> 군사쿠데타를 성공시킨 사례여서</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_5',false,'1980')"><span class="opt-mark">②</span> 전두환 정권을 즉시 무너뜨려서</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_5',true,'1980')"><span class="opt-mark">③</span> 군부 독재에 맞선 시민 저항 정신을 보여주고, 이후 민주화 운동의 정신적 기반이 되었기 때문에</button>
+        <button class="opt-btn" onclick="answer(this,'q1980_5',false,'1980')"><span class="opt-mark">④</span> 경제 발전을 이룬 모범 사례여서</button>
+      </div>
+      <div class="explanation" id="exp_q1980_5">
+        <div class="label">💡 해설</div>
+        5·18 광주 민주화운동은 비록 계엄군에 의해 진압되었지만, 군부 독재에 맞선 시민의 저항 정신을 전 세계에 보여주었어요. 이 운동의 진실이 알려지면서 이후 민주화 운동에 큰 영향을 주었고, 오늘날 유네스코 세계기록유산으로 등재되어 인류 보편의 민주주의 유산이 되었습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ───────────── 1990년대~ ───────────── -->
+<div id="d1990" class="decade-panel">
+  <div class="era-header era-1990">
+    <div>
+      <div class="era-title">🗳️ 1990년대~ — 민주주의 꽃을 피우다</div>
+      <div class="era-sub">30년간의 군사 독재를 끝내고, 시민이 직접 대통령을 선택하는 시대가 열렸습니다</div>
+      <div class="era-keyword">
+        <span class="kw">문민정부</span><span class="kw">김영삼</span>
+        <span class="kw">지방자치제</span><span class="kw">IMF</span><span class="kw">촛불집회</span>
+      </div>
+    </div>
+    <img class="era-img"
+      src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect fill='%23ede9fe' width='120' height='120' rx='12'/><text y='70' x='60' text-anchor='middle' fill='%237c3aed' font-size='60'>🗳️</text></svg>"
+      alt="1990s">
+  </div>
+
+  <div class="figure-gallery">
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Kim_Young-sam_portrait.jpg/440px-Kim_Young-sam_portrait.jpg" alt="김영삼" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2224%22>👤</text></svg>'">
+      <div class="figure-name">김영삼</div>
+      <div class="figure-desc">14대 대통령<br>문민정부</div>
+    </div>
+    <div class="figure-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Kim_Dae-jung_headshot.jpg/440px-Kim_Dae-jung_headshot.jpg" alt="김대중" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22110%22><rect fill=%22%23e2e8f0%22 width=%22100%22 height=%22110%22/><text y=%2260%22 x=%2250%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2224%22>👤</text></svg>'">
+      <div class="figure-name">김대중</div>
+      <div class="figure-desc">15대 대통령<br>노벨평화상</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23fef3c7' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23d97706' font-size='40'>🕯️</text><text y='80' x='50' text-anchor='middle' fill='%2392400e' font-size='10'>촛불집회</text></svg>" alt="촛불집회">
+      <div class="figure-name">촛불집회</div>
+      <div class="figure-desc">시민 직접<br>민주주의</div>
+    </div>
+    <div class="figure-card">
+      <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='110'><rect fill='%23d1fae5' width='100' height='110'/><text y='55' x='50' text-anchor='middle' fill='%23065f46' font-size='36'>🏙️</text><text y='80' x='50' text-anchor='middle' fill='%23065f46' font-size='10'>지방자치제</text></svg>" alt="지방자치">
+      <div class="figure-name">지방자치제</div>
+      <div class="figure-desc">1995년<br>풀뿌리 민주주의</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <h3>📌 주요 역사 흐름</h3>
+    <div class="tl-item">
+      <div class="tl-year">1993</div>
+      <div class="tl-text"><strong>문민정부 출범</strong> — 김영삼 대통령 취임. 1961년 군사쿠데타 이후 32년 만에 군인이 아닌 민간인 대통령 탄생 <span class="tl-heart">✦</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1995</div>
+      <div class="tl-text"><strong>지방자치제 전면 실시</strong> — 지방 시장·도지사·군수를 주민이 직접 선거로 선출. 풀뿌리 민주주의 실현</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1998</div>
+      <div class="tl-text"><strong>김대중 정부 출범</strong> — 첫 평화적 여야 정권교체. 한국 민주주의의 성숙을 세계에 알림. 2000년 노벨 평화상 수상</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2016~17</div>
+      <div class="tl-text"><strong>촛불 혁명</strong> — 1,000만 시민이 촛불을 들고 헌법과 민주주의 수호를 요구. 헌법재판소의 탄핵 인용으로 마무리 <span class="tl-heart">✦</span></div>
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div>
+      <div class="score-text">맞힌 문제</div>
+      <div class="score-count" id="cnt1990">0 / 5</div>
+    </div>
+    <div class="score-progress"><div class="score-fill" id="fill1990" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetDecade('d1990')">다시 풀기</button>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🧠 1990년대~ 퀴즈 — 5문제</h3>
+
+    <div class="quiz-card" id="q1990_1">
+      <div class="q-header">
+        <div class="q-num">1</div>
+        <div class="q-text">1993년, 1961년 박정희의 군사쿠데타 이후 <strong>32년 만에</strong> 군인이 아닌 민간인 출신 대통령이 취임했습니다. 이 정부를 뭐라고 부르나요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1990_1',false,'1990')"><span class="opt-mark">①</span> 민주정부</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_1',true,'1990')"><span class="opt-mark">②</span> 문민정부</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_1',false,'1990')"><span class="opt-mark">③</span> 국민정부</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_1',false,'1990')"><span class="opt-mark">④</span> 참여정부</button>
+      </div>
+      <div class="explanation" id="exp_q1990_1">
+        <div class="label">💡 해설</div>
+        김영삼 대통령(1993~1998)의 정부를 '문민정부(文民政府)'라고 합니다. '문민'은 군인이 아닌 일반 시민을 뜻해요. 32년 만에 군인이 아닌 민간인이 대통령이 된 것은 6월 민주항쟁의 성과였습니다. 김영삼은 하나회 해체, 금융실명제 실시 등 개혁을 추진했어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1990_2">
+      <div class="q-header">
+        <div class="q-num">2</div>
+        <div class="q-text">1998년 김대중 대통령의 취임이 한국 민주주의 발전에서 중요한 이유는 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1990_2',false,'1990')"><span class="opt-mark">①</span> 처음으로 대통령이 된 사람이어서</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_2',true,'1990')"><span class="opt-mark">②</span> 야당에서 여당으로 평화적 정권 교체가 처음 이루어졌기 때문에</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_2',false,'1990')"><span class="opt-mark">③</span> 가장 나이가 많은 대통령이어서</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_2',false,'1990')"><span class="opt-mark">④</span> 처음으로 여성 장관을 임명해서</button>
+      </div>
+      <div class="explanation" id="exp_q1990_2">
+        <div class="label">💡 해설</div>
+        1998년 김대중 정부의 출범은 대한민국 헌정 사상 최초의 여야 간 평화적 정권교체였어요. 선거라는 민주적 절차로 집권당이 바뀐 것은 민주주의가 뿌리를 내렸다는 증거입니다. 김대중 대통령은 한반도 평화 노력을 인정받아 2000년 노벨 평화상을 수상했어요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1990_3">
+      <div class="q-header">
+        <div class="q-num">3</div>
+        <div class="q-text">1995년에 전면 실시된 제도로, 시민이 자기 지역의 시장·도지사·군수 등을 직접 투표로 선출하는 제도는 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1990_3',false,'1990')"><span class="opt-mark">①</span> 국민투표제</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_3',true,'1990')"><span class="opt-mark">②</span> 지방자치제</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_3',false,'1990')"><span class="opt-mark">③</span> 비례대표제</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_3',false,'1990')"><span class="opt-mark">④</span> 국민소환제</button>
+      </div>
+      <div class="explanation" id="exp_q1990_3">
+        <div class="label">💡 해설</div>
+        지방자치제는 지역 주민이 자기 지역 지도자(시장, 도지사 등)를 직접 뽑고, 지역 살림을 스스로 결정하는 제도예요. 1995년 전면 실시된 지방자치제는 서울뿐 아니라 전국 어디서나 주민이 정치에 참여할 수 있게 해 '풀뿌리 민주주의'라고도 불려요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1990_4">
+      <div class="q-header">
+        <div class="q-num">4</div>
+        <div class="q-text">2016~2017년, 1,000만 명이 넘는 시민들이 광장에 나와 촛불을 들며 헌법과 민주주의 수호를 요구한 사건을 무엇이라고 하나요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1990_4',false,'1990')"><span class="opt-mark">①</span> 4·19 혁명</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_4',false,'1990')"><span class="opt-mark">②</span> 6월 민주항쟁</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_4',true,'1990')"><span class="opt-mark">③</span> 촛불 혁명(촛불 집회)</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_4',false,'1990')"><span class="opt-mark">④</span> 부마 항쟁</button>
+      </div>
+      <div class="explanation" id="exp_q1990_4">
+        <div class="label">💡 해설</div>
+        2016~2017년 촛불 혁명은 폭력 없이 평화적인 방식으로 진행된 세계 역사상 드문 시민 운동이에요. 매주 주말 수백만 명이 광장에 모여 촛불을 들었고, 결국 헌법재판소가 대통령 탄핵을 인용했습니다. 1960년 4·19 혁명에서 시작된 시민 저항 정신이 현대에 이어진 사례예요.
+      </div>
+    </div>
+
+    <div class="quiz-card" id="q1990_5">
+      <div class="q-header">
+        <div class="q-num">5</div>
+        <div class="q-text">1950년대부터 시작된 대한민국 민주화운동을 통해 우리가 배울 수 있는 가장 중요한 교훈은 무엇인가요?</div>
+      </div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1990_5',false,'1990')"><span class="opt-mark">①</span> 강한 지도자 한 명이 나라를 이끌어야 한다</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_5',false,'1990')"><span class="opt-mark">②</span> 경제 발전이 민주주의보다 더 중요하다</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_5',true,'1990')"><span class="opt-mark">③</span> 민주주의는 시민들의 끊임없는 관심과 참여로 지켜지고 발전한다</button>
+        <button class="opt-btn" onclick="answer(this,'q1990_5',false,'1990')"><span class="opt-mark">④</span> 외국의 도움 없이는 민주주의를 이룰 수 없다</button>
+      </div>
+      <div class="explanation" id="exp_q1990_5">
+        <div class="label">💡 해설</div>
+        4·19 혁명부터 촛불 혁명까지, 대한민국 민주주의는 특별한 영웅 한 명이 만든 것이 아니에요. 이름도 알려지지 않은 수많은 학생, 노동자, 시민들이 자신의 목숨과 자유를 걸고 함께 지켜낸 것입니다. 민주주의는 당연히 주어지는 것이 아니라, 우리가 계속 관심을 갖고 참여해야 지켜지는 소중한 가치예요.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 마무리 -->
+<div class="outro">
+  <h2>🕊️ 민주주의는 우리 모두의 것입니다</h2>
+  <p>4·19 혁명, 5·18 광주, 6월 항쟁, 촛불 혁명 — 이 모든 역사는 평범한 학생, 노동자, 시민들이 함께 만들었습니다.<br>그 희생을 기억하고, 민주주의를 소중히 여기는 여러분이 다음 세대의 주인공입니다.</p>
+</div>
+
+</div><!-- /container -->
+
+<script>
+const scores = { '1950': 0, '1960': 0, '1970': 0, '1980': 0, '1990': 0 };
+const answered = { '1950': 0, '1960': 0, '1970': 0, '1980': 0, '1990': 0 };
+
+function answer(btn, qid, correct, decade) {
+  const card = document.getElementById(qid);
+  if (card.classList.contains('answered')) return;
+  card.classList.add('answered');
+
+  const buttons = card.querySelectorAll('.opt-btn');
+  buttons.forEach(b => b.disabled = true);
+
+  if (correct) {
+    btn.classList.add('correct');
+    btn.querySelector('.opt-mark').textContent = '✓';
+    scores[decade]++;
+  } else {
+    btn.classList.add('wrong');
+    btn.querySelector('.opt-mark').textContent = '✗';
+    // 정답 찾아서 표시
+    buttons.forEach(b => {
+      if (b.onclick.toString().includes('true')) {
+        b.classList.add('correct');
+        b.querySelector('.opt-mark').textContent = '✓';
+      }
+    });
+  }
+
+  answered[decade]++;
+  updateScore(decade);
+
+  const exp = document.getElementById('exp_' + qid);
+  if (exp) exp.classList.add('show');
+}
+
+function updateScore(decade) {
+  const cnt = document.getElementById('cnt' + decade);
+  const fill = document.getElementById('fill' + decade);
+  const s = scores[decade];
+  const total = 5;
+  if (cnt) cnt.textContent = s + ' / ' + total;
+  if (fill) fill.style.width = (s / total * 100) + '%';
+}
+
+function resetDecade(panelId) {
+  const decade = panelId.replace('d','');
+  scores[decade] = 0;
+  answered[decade] = 0;
+  updateScore(decade);
+
+  const panel = document.getElementById(panelId);
+  panel.querySelectorAll('.quiz-card').forEach(card => {
+    card.classList.remove('answered');
+    card.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('correct','wrong');
+      const mark = btn.querySelector('.opt-mark');
+      const orig = ['①','②','③','④'];
+      // 순서 복원
+    });
+    // 모든 버튼 마크 원래대로
+    const btns = card.querySelectorAll('.opt-btn');
+    const marks = ['①','②','③','④'];
+    btns.forEach((b, i) => {
+      b.querySelector('.opt-mark').textContent = marks[i];
+    });
+  });
+  panel.querySelectorAll('.explanation').forEach(e => e.classList.remove('show'));
+}
+
+function showDecade(id, btn) {
+  document.querySelectorAll('.decade-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
