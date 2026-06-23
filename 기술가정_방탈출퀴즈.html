@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔐 기술·가정 방탈출 퀴즈!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: #0a0f1e;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #e2e8f0;
+    }
+
+    .bg {
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 44px,
+          rgba(99,179,237,.03) 44px, rgba(99,179,237,.03) 46px),
+        repeating-linear-gradient(90deg, transparent, transparent 66px,
+          rgba(99,179,237,.03) 66px, rgba(99,179,237,.03) 68px),
+        radial-gradient(ellipse at 50% 0%, #0d2240 0%, #0a0f1e 70%);
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+
+    .screen { width: 100%; }
+    .hidden { display: none !important; }
+
+    /* ══ 타이틀 ══ */
+    #titleScreen { text-align: center; animation: zoomIn .6s ease; }
+
+    .title-icon { font-size: 80px; display: block; animation: wobble 2.5s infinite; }
+
+    .game-title {
+      font-size: clamp(1.8rem, 5.5vw, 2.8rem);
+      font-weight: 900;
+      color: #63b3ed;
+      text-shadow: 3px 3px 0 #1a5276, 0 0 30px rgba(99,179,237,.5);
+      margin: 16px 0 8px;
+      line-height: 1.2;
+    }
+
+    .game-sub {
+      font-size: 1rem;
+      color: #a0aec0;
+      margin-bottom: 6px;
+    }
+
+    .textbook-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #2d6a4f, #1b4332);
+      border: 2px solid #52b788;
+      color: #b7e4c7;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+
+    .story-box {
+      background: rgba(99,179,237,.08);
+      border: 1px solid rgba(99,179,237,.25);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 0 auto 28px;
+      max-width: 580px;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #cbd5e0;
+      text-align: left;
+    }
+    .story-box strong { color: #ffd700; }
+
+    .room-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .room-chip {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 50px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      color: #a0aec0;
+    }
+    .room-chip span { margin-right: 6px; }
+
+    .btn-start {
+      background: linear-gradient(135deg, #3182ce, #2b6cb0);
+      color: #fff;
+      border: none;
+      padding: 18px 52px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(49,130,206,.5);
+      transition: all .2s;
+      letter-spacing: .5px;
+    }
+    .btn-start:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(49,130,206,.6); }
+
+    /* ══ 방 전환 화면 ══ */
+    #roomIntroScreen { text-align: center; animation: slideDown .5s ease; }
+
+    .room-number {
+      font-size: 0.9rem;
+      color: #63b3ed;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+
+    .room-big-icon { font-size: 100px; display: block; margin: 16px 0; animation: pulse 1.5s infinite; }
+
+    .room-title {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .room-desc {
+      color: #a0aec0;
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    .room-lock-display {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .lock-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #e53e3e;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(229,62,62,.4);
+      transition: all .4s;
+    }
+
+    .btn-enter-room {
+      background: linear-gradient(135deg, #e53e3e, #c53030);
+      color: #fff;
+      border: none;
+      padding: 16px 44px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(229,62,62,.4);
+      transition: all .2s;
+      animation: heartbeat 1.5s infinite;
+    }
+    .btn-enter-room:hover { transform: translateY(-3px); }
+
+    /* ══ 퀴즈 화면 ══ */
+    #quizScreen { animation: fadeIn .4s ease; }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .room-badge {
+      background: rgba(99,179,237,.15);
+      border: 1px solid rgba(99,179,237,.4);
+      color: #63b3ed;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .progress-area { flex: 1; min-width: 160px; }
+
+    .progress-text {
+      font-size: 0.78rem;
+      color: #718096;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3182ce, #63b3ed);
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+
+    .score-display {
+      background: rgba(72,187,120,.15);
+      border: 1px solid rgba(72,187,120,.35);
+      color: #68d391;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .question-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .q-num {
+      position: absolute;
+      top: -14px; left: 20px;
+      background: linear-gradient(135deg, #3182ce, #2b6cb0);
+      color: #fff;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .q-emoji { font-size: 2rem; margin-bottom: 10px; display: block; }
+
+    .q-text {
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      font-weight: 700;
+      color: #e2e8f0;
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    .q-hint {
+      font-size: 0.82rem;
+      color: #718096;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .choice-btn {
+      background: rgba(255,255,255,.05);
+      border: 2px solid rgba(255,255,255,.12);
+      color: #cbd5e0;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: rgba(99,179,237,.12);
+      border-color: rgba(99,179,237,.4);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    .choice-btn.correct {
+      background: rgba(72,187,120,.2) !important;
+      border-color: #68d391 !important;
+      color: #9ae6b4 !important;
+    }
+
+    .choice-btn.wrong {
+      background: rgba(229,62,62,.15) !important;
+      border-color: #fc8181 !important;
+      color: #feb2b2 !important;
+    }
+
+    .choice-btn:disabled { cursor: default; }
+
+    .choice-label {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    .choice-btn.correct .choice-label { background: #68d391; color: #1a202c; }
+    .choice-btn.wrong .choice-label { background: #fc8181; color: #1a202c; }
+
+    /* 피드백 */
+    .feedback-box {
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      animation: slideDown .3s ease;
+    }
+
+    .feedback-box.ok {
+      background: rgba(72,187,120,.12);
+      border: 1px solid rgba(72,187,120,.3);
+      color: #9ae6b4;
+    }
+
+    .feedback-box.fail {
+      background: rgba(229,62,62,.1);
+      border: 1px solid rgba(229,62,62,.25);
+      color: #feb2b2;
+    }
+
+    .feedback-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .btn-next {
+      width: 100%;
+      background: linear-gradient(135deg, #3182ce, #2b6cb0);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 3px 14px rgba(49,130,206,.35);
+    }
+    .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(49,130,206,.5); }
+
+    /* ══ 결과 화면 ══ */
+    #resultScreen { text-align: center; animation: zoomIn .6s ease; }
+
+    .result-icon { font-size: 90px; display: block; animation: bounce 1s infinite alternate; }
+
+    .result-title {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 900;
+      margin: 14px 0 6px;
+    }
+
+    .result-score-big {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 3px 3px 0 #b7791f;
+      margin: 8px 0;
+    }
+
+    .result-grade {
+      display: inline-block;
+      padding: 8px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 22px;
+    }
+
+    .room-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .room-result-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .rrc-icon { font-size: 1.8rem; }
+    .rrc-name { font-size: 0.75rem; color: #718096; margin: 4px 0 2px; }
+    .rrc-score { font-size: 1.1rem; font-weight: 800; }
+
+    .confetti-row { font-size: 1.8rem; margin-bottom: 18px; animation: spin 3s linear infinite; display: inline-block; }
+
+    .btn-retry {
+      background: linear-gradient(135deg, #805ad5, #6b46c1);
+      color: #fff;
+      border: none;
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(128,90,213,.4);
+      transition: all .2s;
+      margin: 0 8px 12px;
+    }
+    .btn-retry:hover { transform: translateY(-3px); }
+
+    /* 잠금 해제 애니메이션 */
+    .unlock-screen {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.85);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      animation: fadeIn .3s;
+    }
+
+    .unlock-screen.hidden { display: none !important; }
+
+    .unlock-icon { font-size: 100px; animation: tada 1s; }
+    .unlock-text {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 2px 2px 0 #b7791f;
+      margin: 16px 0 8px;
+    }
+    .unlock-sub { color: #a0aec0; margin-bottom: 28px; }
+
+    .btn-next-room {
+      background: linear-gradient(135deg, #ffd700, #f6ad55);
+      color: #1a202c;
+      border: none;
+      padding: 16px 44px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,215,0,.4);
+      transition: all .2s;
+    }
+    .btn-next-room:hover { transform: scale(1.05); }
+
+    /* 애니메이션 */
+    @keyframes zoomIn { from { opacity:0; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes wobble {
+      0%,100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes heartbeat {
+      0%,100% { box-shadow: 0 4px 18px rgba(229,62,62,.4); }
+      50% { box-shadow: 0 4px 28px rgba(229,62,62,.7); }
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-14px); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes tada {
+      0% { transform: scale(1); }
+      10%,20% { transform: scale(.9) rotate(-3deg); }
+      30%,50%,70%,90% { transform: scale(1.1) rotate(3deg); }
+      40%,60%,80% { transform: scale(1.1) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+
+    /* 파티클 효과 */
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+    .particle {
+      position: absolute;
+      top: -10px;
+      font-size: 1.4rem;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .question-card { padding: 22px 16px 18px; }
+      .choice-btn { padding: 12px 14px; font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+
+<!-- 파티클 컨테이너 -->
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+  <!-- ══════════ 타이틀 ══════════ -->
+  <div id="titleScreen" class="screen">
+    <span class="title-icon">🔐</span>
+    <h1 class="game-title">기술·가정<br>방탈출 퀴즈!</h1>
+    <p class="game-sub">5개의 잠긴 방을 탈출하라!</p>
+    <div class="textbook-badge">📚 2022개정 미래엔 기술·가정① 4단원</div>
+
+    <div class="story-box">
+      <strong>📜 스토리</strong><br>
+      당신은 첨단 기술 연구소에 갇혔습니다!<br>
+      5개의 방에 걸린 <strong>자물쇠</strong>를 풀어야만 탈출할 수 있어요.<br>
+      각 방마다 <strong>10문제</strong>를 풀어 자물쇠 코드를 획득하세요!<br>
+      총 <strong>50문제</strong>로 구성되어 있습니다. 🧠✨
+    </div>
+
+    <div class="room-preview">
+      <div class="room-chip"><span>⚙️</span>Room 1 — 기술의 역사</div>
+      <div class="room-chip"><span>🏭</span>Room 2 — 산업혁명</div>
+      <div class="room-chip"><span>📐</span>Room 3 — 표준화의 방</div>
+      <div class="room-chip"><span>💡</span>Room 4 — 발명 연구소</div>
+      <div class="room-chip"><span>🌍</span>Room 5 — 적정기술 박사실</div>
+    </div>
+
+    <button class="btn-start" onclick="startGame()">🚀 게임 시작!</button>
+  </div>
+
+  <!-- ══════════ 방 소개 ══════════ -->
+  <div id="roomIntroScreen" class="screen hidden">
+    <div class="room-number" id="roomNumLabel">ROOM 1</div>
+    <span class="room-big-icon" id="roomBigIcon">⚙️</span>
+    <h2 class="room-title" id="roomTitleLabel">기술의 역사</h2>
+    <p class="room-desc" id="roomDescLabel">기술의 시작부터 현재까지!</p>
+    <div class="room-lock-display" id="lockDotsEl"></div>
+    <button class="btn-enter-room" onclick="enterRoom()">🔓 이 방으로 들어가기!</button>
+  </div>
+
+  <!-- ══════════ 퀴즈 ══════════ -->
+  <div id="quizScreen" class="screen hidden">
+    <div class="quiz-header">
+      <div class="room-badge" id="quizRoomBadge">Room 1</div>
+      <div class="progress-area">
+        <div class="progress-text">
+          <span id="progText">1 / 10</span>
+          <span id="progPct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="score-display">⭐ <span id="scoreEl">0</span>점</div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-num" id="qNumEl">Q1</div>
+      <span class="q-emoji" id="qEmojiEl">❓</span>
+      <div class="q-text" id="qTextEl"></div>
+      <div class="q-hint" id="qHintEl"></div>
+    </div>
+
+    <div class="choices" id="choicesEl"></div>
+
+    <div class="feedback-box hidden" id="feedbackEl">
+      <div class="feedback-title" id="fbTitle"></div>
+      <div id="fbBody"></div>
+    </div>
+
+    <button class="btn-next hidden" id="nextBtn" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+
+  <!-- ══════════ 최종 결과 ══════════ -->
+  <div id="resultScreen" class="screen hidden">
+    <span class="result-icon" id="resultIcon">🏆</span>
+    <div class="result-title" id="resultTitle">탈출 성공!</div>
+    <div class="result-score-big"><span id="finalScore">0</span> / 50점</div>
+    <div class="result-grade" id="resultGrade">등급</div>
+
+    <div class="room-results" id="roomResultsEl"></div>
+
+    <div class="confetti-row">🎊</div>
+    <p style="color:#a0aec0;font-size:.9rem;margin-bottom:20px;">복습하고 다시 도전해보세요! 💪</p>
+
+    <button class="btn-retry" onclick="location.reload()">🔄 다시 도전!</button>
+  </div>
+
+</div>
+
+<!-- ══════════ 방 탈출 팝업 ══════════ -->
+<div class="unlock-screen hidden" id="unlockScreen">
+  <div class="unlock-icon" id="unlockIcon">🔓</div>
+  <div class="unlock-text" id="unlockText">Room 1 탈출!</div>
+  <div class="unlock-sub" id="unlockSub">자물쇠가 열렸습니다!</div>
+  <button class="btn-next-room" id="unlockBtn">다음 방으로 →</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  데이터: 5개 방 × 10문제
+// ══════════════════════════════════════════════
+const ROOMS = [
+  {
+    id: 1,
+    icon: '⚙️',
+    title: '기술의 역사 창고',
+    desc: '기술의 뜻과 역사적 발명들을 알아야 자물쇠가 열린다!',
+    color: '#3182ce',
+    questions: [
+      {
+        emoji: '🔧',
+        q: '기술(Technology)이란 무엇인가요?',
+        hint: '인간과 자연의 관계를 생각해보세요!',
+        choices: ['인간이 자연을 변화시켜 필요한 물건이나 환경을 만드는 방법', '기계와 로봇을 만드는 학문', '컴퓨터와 인터넷에 관한 모든 지식', '수학과 과학을 합친 학문'],
+        answer: 0,
+        explain: '기술은 인간이 자연을 변화시켜 필요한 물건이나 환경을 만드는 방법과 과정이에요!'
+      },
+      {
+        emoji: '📸',
+        q: '1839년에 사진을 발명한 사람은 누구인가요?',
+        hint: '프랑스 출신의 발명가예요.',
+        choices: ['에디슨', '스티븐슨', '다게르', '아크라이트'],
+        answer: 2,
+        explain: '다게르(Daguerre, 1787~1851)가 1839년에 사진을 발명했어요! 인류 최초의 사진이죠.'
+      },
+      {
+        emoji: '🚂',
+        q: '증기기관차를 발명한 사람은 누구인가요?',
+        hint: '영국 출신으로 1800년대 초 활동했어요.',
+        choices: ['다게르', '스티븐슨', '에디슨', '아크라이트'],
+        answer: 1,
+        explain: '스티븐슨(Stephenson, 1781~1848)이 증기기관차를 발명했어요! 철도 교통의 아버지라 불려요.'
+      },
+      {
+        emoji: '💡',
+        q: '에디슨이 전구를 발명한 연도는 언제인가요?',
+        hint: '1800년대 후반이에요.',
+        choices: ['1854년', '1879년', '1886년', '1901년'],
+        answer: 1,
+        explain: '에디슨이 1879년에 전구를 발명했어요! 250가지 이상의 발명품 중 하나랍니다.'
+      },
+      {
+        emoji: '🧵',
+        q: '1769년에 방적기(실을 뽑는 기계)를 발명한 사람은 누구인가요?',
+        hint: '1700년대 영국의 발명가예요.',
+        choices: ['스티븐슨', '다게르', '아크라이트', '에디슨'],
+        answer: 2,
+        explain: '아크라이트(1732~1792)가 1769년에 방적기를 발명해 1차 산업혁명의 핵심 인물이 되었어요!'
+      },
+      {
+        emoji: '📰',
+        q: '우리나라 최초의 신문 형태가 발행된 것으로 알려진 것은?',
+        hint: '교과서 타임라인에 1600년대가 나와 있어요.',
+        choices: ['목판 인쇄', '직지심경', '조보', '훈민정음'],
+        answer: 2,
+        explain: '1600년대에 조선시대의 관보인 조보(朝報)가 발행되었어요!'
+      },
+      {
+        emoji: '🔬',
+        q: '기술의 발전이 우리 생활에 미치는 영향으로 옳지 않은 것은?',
+        hint: '기술 발전이 모든 면에서 긍정적인 영향만 미칠까요?',
+        choices: ['생활이 편리해진다', '새로운 직업이 생긴다', '환경 문제가 전혀 발생하지 않는다', '이동 수단이 발전한다'],
+        answer: 2,
+        explain: '기술 발전은 편리함을 주지만, 환경 오염 등 부정적인 영향도 있을 수 있어요. 기술을 올바르게 사용하는 것이 중요해요!'
+      },
+      {
+        emoji: '🏭',
+        q: '1차 산업혁명은 몇 세기에 시작되었나요?',
+        hint: '1700년대예요.',
+        choices: ['16세기', '17세기', '18세기', '20세기'],
+        answer: 2,
+        explain: '1차 산업혁명은 18세기(1700년대) 영국에서 시작되었어요! 증기기관이 핵심이었죠.'
+      },
+      {
+        emoji: '🌐',
+        q: '2차 산업혁명의 핵심 에너지원은 무엇인가요?',
+        hint: '19세기, 에디슨과 관계있어요.',
+        choices: ['석탄과 증기', '전기', '원자력', '태양광'],
+        answer: 1,
+        explain: '2차 산업혁명(19세기)은 전기 에너지가 핵심이었어요! 에디슨의 전구 발명도 이 시기의 산물이에요.'
+      },
+      {
+        emoji: '📱',
+        q: '2003년에 RFID, 사물인터넷(IoT), 3D 프린팅 등이 활용되기 시작한 것은 몇 차 산업혁명과 관련이 있나요?',
+        hint: '가장 최근의 산업혁명이에요.',
+        choices: ['1차', '2차', '3차', '4차'],
+        answer: 3,
+        explain: 'RFID, IoT, 3D프린팅, 인공지능 등은 4차 산업혁명과 관련이 있어요! 지금 우리가 살고 있는 시대예요.'
+      },
+    ]
+  },
+  {
+    id: 2,
+    icon: '🏭',
+    title: '산업혁명 타임머신',
+    desc: '산업혁명의 흐름을 꿰뚫어야 시간여행이 완성된다!',
+    color: '#e53e3e',
+    questions: [
+      {
+        emoji: '⏳',
+        q: '다음 중 1차 산업혁명의 특징으로 옳은 것은?',
+        hint: '증기기관이 핵심이에요!',
+        choices: ['전기 에너지가 활용되었다', '증기기관을 이용한 기계 생산이 시작되었다', '인터넷과 컴퓨터가 발달했다', '인공지능이 도입되었다'],
+        answer: 1,
+        explain: '1차 산업혁명(18세기~)은 증기기관을 이용한 기계화가 핵심이에요! 수작업에서 기계 생산으로 전환되었죠.'
+      },
+      {
+        emoji: '🔌',
+        q: '2차 산업혁명 시기(19세기~)의 특징으로 옳은 것은?',
+        hint: '에디슨의 발명이 이 시기예요.',
+        choices: ['농업이 발달했다', '전기를 이용한 대량 생산이 시작되었다', '우주 개발이 시작되었다', 'AI가 일자리를 대체했다'],
+        answer: 1,
+        explain: '2차 산업혁명(19세기~)은 전기를 이용한 대량 생산이 특징이에요! 전구, 전화 등이 이 시기에 발명되었죠.'
+      },
+      {
+        emoji: '💻',
+        q: '3차 산업혁명(20세기~)의 핵심 기술은 무엇인가요?',
+        hint: '디지털 기술이 등장하는 시기예요.',
+        choices: ['증기기관', '전기', '컴퓨터와 인터넷', '인공지능과 빅데이터'],
+        answer: 2,
+        explain: '3차 산업혁명은 컴퓨터와 인터넷이 핵심이에요! 디지털 혁명이라고도 불러요.'
+      },
+      {
+        emoji: '🤖',
+        q: '4차 산업혁명의 특징으로 옳지 않은 것은?',
+        hint: '어떤 기술이 4차 산업혁명과 관계없을까요?',
+        choices: ['인공지능(AI)', '빅데이터', '증기기관의 발명', '사물인터넷(IoT)'],
+        answer: 2,
+        explain: '증기기관의 발명은 1차 산업혁명(18세기)이에요! 4차 산업혁명은 AI, 빅데이터, IoT, 자율주행 등이 핵심이에요.'
+      },
+      {
+        emoji: '🧑‍🔬',
+        q: '에디슨에 대한 설명으로 옳은 것은?',
+        hint: '발명왕이라 불리는 과학자예요.',
+        choices: ['방적기를 발명했다', '약 250가지 이상의 발명품을 남겼다', '증기기관차를 발명했다', '사진술을 발명했다'],
+        answer: 1,
+        explain: '에디슨(1847~1931)은 250가지 이상의 발명품을 남긴 발명왕이에요! 전구, 축음기, 영화 등을 발명했어요.'
+      },
+      {
+        emoji: '📅',
+        q: '다게르가 사진을 발명한 연도는?',
+        hint: '1800년대 중반보다 조금 전이에요.',
+        choices: ['1807년', '1829년', '1839년', '1879년'],
+        answer: 2,
+        explain: '다게르가 1839년에 세계 최초의 실용적인 사진술(다게레오타입)을 발명했어요!'
+      },
+      {
+        emoji: '🚗',
+        q: '1886년에 발명된 것은 무엇인가요?',
+        hint: '현대 교통수단의 원조예요.',
+        choices: ['비행기', '자동차', '기차', '잠수함'],
+        answer: 1,
+        explain: '1886년에 벤츠가 가솔린 자동차를 발명했어요! 교과서에 1886 = 1818 + 68이라는 계산식과 함께 나와 있어요.'
+      },
+      {
+        emoji: '✈️',
+        q: '1903년 라이트 형제가 발명한 것은?',
+        hint: '하늘을 나는 기계예요.',
+        choices: ['헬리콥터', '비행선', '비행기', '우주선'],
+        answer: 2,
+        explain: '1903년 라이트 형제가 동력 비행기를 최초로 비행시켰어요! 인류가 하늘을 날게 된 역사적인 순간이죠.'
+      },
+      {
+        emoji: '🌐',
+        q: '다음 중 산업혁명의 가장 큰 의의는?',
+        hint: '생산 방식의 변화예요.',
+        choices: ['농업 생산량이 늘었다', '수작업이 기계 생산으로 바뀌며 대량 생산이 가능해졌다', '무기가 발달했다', '통신이 발전했다'],
+        answer: 1,
+        explain: '산업혁명의 핵심은 수작업에서 기계 생산으로 바뀌어 대량 생산이 가능해진 것이에요! 인류 생활을 완전히 바꾼 사건이죠.'
+      },
+      {
+        emoji: '🏗️',
+        q: '기술의 발달 과정에서 250가지 발명품을 남기고 1가지를 상용화하는 것으로 알려진 발명가는?',
+        hint: '"천재는 1%의 영감과 99%의 노력"이라고 말한 사람이에요.',
+        choices: ['아크라이트', '스티븐슨', '에디슨', '다게르'],
+        answer: 2,
+        explain: '에디슨이에요! 250가지의 발명 아이디어 중 1가지를 상용화한다는 유명한 이야기가 있어요. 천재는 1%의 영감과 99%의 노력!'
+      },
+    ]
+  },
+  {
+    id: 3,
+    icon: '📐',
+    title: '표준화의 방',
+    desc: 'KS, ISO, A4 용지... 표준의 세계를 정복하라!',
+    color: '#805ad5',
+    questions: [
+      {
+        emoji: '🇰🇷',
+        q: 'KS는 무엇의 약자인가요?',
+        hint: '한국의 산업 표준이에요.',
+        choices: ['한국 스포츠', '한국산업표준', '코리아 사이언스', '한국 안전'],
+        answer: 1,
+        explain: 'KS는 한국산업표준(Korean Industrial Standards)의 약자예요! 우리나라 제품의 품질을 보증하는 표준이에요.'
+      },
+      {
+        emoji: '🌍',
+        q: 'ISO는 무엇의 약자인가요?',
+        hint: '국제적인 표준화 기구예요.',
+        choices: ['국제표준화기구', '국제우주기구', '국제서비스연합', '국제안전기구'],
+        answer: 0,
+        explain: 'ISO는 국제표준화기구(International Organization for Standardization)예요! 전 세계 제품과 서비스의 표준을 만들어요.'
+      },
+      {
+        emoji: '⚡',
+        q: 'IEC는 무엇의 약자인가요?',
+        hint: '전기 관련 국제 기구예요.',
+        choices: ['국제교육위원회', '국제전기기술위원회', '국제에너지공사', '국제공학협의회'],
+        answer: 1,
+        explain: 'IEC는 국제전기기술위원회(International Electrotechnical Commission)예요! 전기·전자 분야 국제 표준을 담당해요.'
+      },
+      {
+        emoji: '📡',
+        q: 'ITU는 무엇의 약자인가요?',
+        hint: '통신 관련 국제 기구예요.',
+        choices: ['국제통신연합', '국제기술대학', '국제전기통신연합', '국제무역연합'],
+        answer: 2,
+        explain: 'ITU는 국제전기통신연합(International Telecommunication Union)이에요! 전 세계 통신 표준을 담당해요.'
+      },
+      {
+        emoji: '📄',
+        q: 'A4 용지의 가로 × 세로 크기는?',
+        hint: '교과서에 정확히 나와 있어요!',
+        choices: ['192mm × 270mm', '200mm × 280mm', '210mm × 297mm', '220mm × 310mm'],
+        answer: 2,
+        explain: 'A4 용지는 210mm × 297mm예요! A0(1m²)를 16등분한 크기랍니다.'
+      },
+      {
+        emoji: '📦',
+        q: 'A0 용지의 넓이는 얼마인가요?',
+        hint: '1제곱미터예요!',
+        choices: ['0.5m²', '1m²', '2m²', '4m²'],
+        answer: 1,
+        explain: 'A0 용지의 넓이는 정확히 1m²(1제곱미터)예요! A 시리즈 용지는 A0를 계속 반으로 잘라 만들어요.'
+      },
+      {
+        emoji: '👟',
+        q: '우리나라(KS)의 신발 사이즈 단위는?',
+        hint: '밀리미터로 표시해요.',
+        choices: ['mm(밀리미터)', 'cm(센티미터)', 'EU 숫자 표기', 'UK 숫자 표기'],
+        answer: 0,
+        explain: '우리나라는 신발 사이즈를 mm(밀리미터)로 표기해요! 예) 250mm. 영국은 UK, 유럽은 EU 단위를 써요.'
+      },
+      {
+        emoji: '📏',
+        q: '국제단위계(SI) 7개 기본 단위 중 길이의 단위는?',
+        hint: 'm으로 표기해요.',
+        choices: ['kg', 'm', 's', 'A'],
+        answer: 1,
+        explain: '길이의 기본 단위는 m(미터)예요! 7개 기본 단위: m(길이), kg(질량), s(시간), A(전류), K(온도), mol(물질량), cd(광도)'
+      },
+      {
+        emoji: '⚖️',
+        q: '국제단위계(SI)에서 질량의 기본 단위는?',
+        hint: '무게를 측정할 때 쓰는 단위예요.',
+        choices: ['g(그램)', 'lb(파운드)', 'kg(킬로그램)', 'N(뉴턴)'],
+        answer: 2,
+        explain: '질량의 기본 단위는 kg(킬로그램)이에요! 무게와 질량은 엄밀히 다르지만 일상에서는 같은 의미로 많이 쓰여요.'
+      },
+      {
+        emoji: '🔋',
+        q: '건전지 규격(AA, AAA, D형 등)이 표준화된 이유는?',
+        hint: '서로 다른 나라, 다른 회사에서 만들어도 호환되어야 해요!',
+        choices: ['더 비싸게 팔기 위해서', '누구나 어디서나 쉽게 교체할 수 있도록', '특정 회사만 만들 수 있게 하기 위해서', '건전지 수명을 늘리기 위해서'],
+        answer: 1,
+        explain: '표준화의 가장 큰 목적은 호환성이에요! AA건전지는 어떤 회사 제품이든 같은 크기와 규격이라 어디서나 쓸 수 있어요.'
+      },
+    ]
+  },
+  {
+    id: 4,
+    icon: '💡',
+    title: '발명가의 비밀 연구소',
+    desc: 'SCAMPER, PMI, 5W1H... 발명의 비법을 찾아라!',
+    color: '#d69e2e',
+    questions: [
+      {
+        emoji: '🧠',
+        q: 'SCAMPER 발명 기법에서 S는 무엇을 뜻하나요?',
+        hint: '대신 다른 것을 쓰는 발상법이에요.',
+        choices: ['합치기(Combine)', '대체하기(Substitute)', '제거하기(Eliminate)', '적용하기(Adapt)'],
+        answer: 1,
+        explain: 'SCAMPER에서 S는 Substitute(대체하기)예요! "다른 재료나 부품으로 대체하면 어떨까?" 라고 생각하는 거예요.'
+      },
+      {
+        emoji: '🔗',
+        q: 'SCAMPER에서 C는 무엇을 뜻하나요?',
+        hint: '두 가지를 합쳐서 새로운 것을 만들어요.',
+        choices: ['변경하기(Change)', '결합하기(Combine)', '만들기(Create)', '색칠하기(Color)'],
+        answer: 1,
+        explain: 'C는 Combine(결합하기)예요! 서로 다른 두 가지를 합쳐서 새로운 발명품을 만드는 방법이에요. (예: 지우개 달린 연필)'
+      },
+      {
+        emoji: '🔄',
+        q: 'SCAMPER에서 R은 무엇을 뜻하나요?',
+        hint: '순서를 바꾸거나 거꾸로 해보는 거예요.',
+        choices: ['재활용하기(Recycle)', '반복하기(Repeat)', '재배열/역전하기(Rearrange/Reverse)', '교체하기(Replace)'],
+        answer: 2,
+        explain: 'R은 Rearrange/Reverse(재배열/역전하기)예요! 순서나 방향을 바꿔서 새로운 아이디어를 떠올려요.'
+      },
+      {
+        emoji: '➕',
+        q: 'PMI 기법에서 P, M, I는 각각 무엇을 뜻하나요?',
+        hint: 'P=긍정, M=부정, I=흥미',
+        choices: ['플러스·마이너스·흥미로운 점', '프로젝트·모델·아이디어', '제품·방법·혁신', '편리함·문제점·개선점'],
+        answer: 0,
+        explain: 'PMI는 Plus(장점), Minus(단점), Interesting(흥미로운 점)이에요! 아이디어를 다각도로 평가하는 방법이에요.'
+      },
+      {
+        emoji: '🏆',
+        q: 'ALU 기법에서 A는 무엇을 뜻하나요?',
+        hint: 'A는 좋은 점이에요.',
+        choices: ['적용성(Applicability)', '장점(Advantage)', '아이디어(Ability)', '예술성(Art)'],
+        answer: 1,
+        explain: 'ALU에서 A는 Advantage(장점)예요! ALU = Advantage(장점), Limitation(한계/단점), Unique qualities(독특한 특성)이에요.'
+      },
+      {
+        emoji: '❓',
+        q: '5W1H 기법에서 Who가 뜻하는 질문은?',
+        hint: '사람을 묻는 질문이에요.',
+        choices: ['언제?', '누가?', '어디서?', '무엇을?'],
+        answer: 1,
+        explain: '5W1H: Who(누가?), When(언제?), Where(어디서?), What(무엇을?), How(어떻게?), Why(왜?) 의 6가지 질문이에요!'
+      },
+      {
+        emoji: '📋',
+        q: '지식재산권의 종류가 아닌 것은?',
+        hint: '특허, 실용신안, 디자인, 상표가 4가지예요.',
+        choices: ['특허', '실용신안', '디자인', '면허'],
+        answer: 3,
+        explain: '지식재산권의 4가지: 특허, 실용신안, 디자인, 상표예요! 면허는 지식재산권이 아니에요.'
+      },
+      {
+        emoji: '📜',
+        q: '세계 최초로 특허 제도가 생긴 연도와 나라는?',
+        hint: '이탈리아의 항구 도시예요.',
+        choices: ['1474년 베네치아(베니스)', '1600년 영국', '1789년 미국', '1883년 프랑스'],
+        answer: 0,
+        explain: '세계 최초의 특허법은 1474년 이탈리아 베네치아(베니스)에서 만들어졌어요! 우리나라는 약 10년의 보호 기간이 주어졌어요.'
+      },
+      {
+        emoji: '🔍',
+        q: '우리나라에서 특허를 검색할 수 있는 시스템의 이름은?',
+        hint: '교과서에 나오는 특허 정보 검색 시스템이에요.',
+        choices: ['KIPRIS', 'PATENT', 'KIPO', 'SEARCH'],
+        answer: 0,
+        explain: 'KIPRIS(특허정보검색서비스)에서 특허를 검색할 수 있어요! 내가 만들고 싶은 발명이 이미 있는지 먼저 확인해야 해요.'
+      },
+      {
+        emoji: '💼',
+        q: 'SCAMPER에서 E는 무엇을 뜻하나요?',
+        hint: '불필요한 것을 없애는 발상법이에요.',
+        choices: ['확장하기(Expand)', '제거하기(Eliminate)', '실험하기(Experiment)', '탐구하기(Explore)'],
+        answer: 1,
+        explain: 'E는 Eliminate(제거하기)예요! "없애면 어떻게 될까?"라고 생각하는 거예요. (예: 무선 마우스 = 선을 제거!)'
+      },
+    ]
+  },
+  {
+    id: 5,
+    icon: '🌍',
+    title: '적정기술 박사의 방',
+    desc: '세상을 바꾸는 기술! 적정기술의 세계를 탐험하라!',
+    color: '#2d6a4f',
+    questions: [
+      {
+        emoji: '🌱',
+        q: '적정기술(Appropriate Technology)이란 무엇인가요?',
+        hint: '개발도상국이나 소외된 지역을 위한 기술이에요.',
+        choices: ['최첨단 기술만을 활용하는 방법', '환경과 사람을 생각하며 지역 사회에 맞게 적용되는 기술', '비싸고 복잡한 하이테크 기술', '군사 목적으로 개발된 기술'],
+        answer: 1,
+        explain: '적정기술은 그 사회의 환경, 문화, 경제적 상황에 맞게 개발·적용되는 기술이에요! 단순하고 저렴하지만 삶을 크게 개선해요.'
+      },
+      {
+        emoji: '💧',
+        q: 'Q-Drum은 어떤 문제를 해결하는 적정기술인가요?',
+        hint: '아프리카 등지에서 물을 나르는 기구예요.',
+        choices: ['식수 오염 문제', '물을 쉽게 운반하는 문제', '물을 정화하는 문제', '빗물을 저장하는 문제'],
+        answer: 1,
+        explain: 'Q-Drum은 원통형 드럼에 물을 넣고 굴려서 운반하는 적정기술이에요! 아프리카에서 먼 거리를 물 짐을 이고 다니는 고충을 해결했어요.'
+      },
+      {
+        emoji: '💡',
+        q: '"Liter of Light(빛 한 리터)"는 어떤 문제를 해결하나요?',
+        hint: '빛이 없는 곳에 조명을 제공해요.',
+        choices: ['물 정화', '전기 없는 지역의 조명', '식량 부족', '의료 문제'],
+        answer: 1,
+        explain: 'Liter of Light는 페트병에 물과 락스를 넣어 지붕에 달면 햇빛이 굴절되어 전구처럼 밝아지는 기술이에요! 전기 없이 낮 동안 조명을 해결해요.'
+      },
+      {
+        emoji: '🥤',
+        q: 'LifeStraw는 어떤 문제를 해결하는 적정기술인가요?',
+        hint: '마시기에 적합하지 않은 물과 관련이 있어요.',
+        choices: ['물을 쉽게 운반', '오염된 물을 정화하여 식수로', '빗물을 모아 저장', '강물의 홍수 예방'],
+        answer: 1,
+        explain: 'LifeStraw는 빨대처럼 생긴 휴대용 정수기예요! 오염된 물도 필터를 통해 바로 마실 수 있게 해줘서 개발도상국 어린이들의 생명을 구했어요.'
+      },
+      {
+        emoji: '⚽',
+        q: 'Soccket(소켓)은 어떤 적정기술인가요?',
+        hint: '축구공과 발전기가 합쳐졌어요!',
+        choices: ['태양광으로 전기를 만드는 공', '축구할 때 운동에너지로 전기를 저장하는 축구공', '물을 정화하는 공', '씨앗을 심을 수 있는 공'],
+        answer: 1,
+        explain: 'Soccket은 축구를 하면서 생기는 운동에너지로 전기를 만들어 저장하는 축구공이에요! 전기 없는 지역에서 LED 조명을 밝힐 수 있어요.'
+      },
+      {
+        emoji: '💧',
+        q: 'Money Maker Pump(모니 메이커 펌프)는 어떤 기술인가요?',
+        hint: '농업과 관련이 있어요.',
+        choices: ['태양열로 작동하는 세탁기', '발로 밟아서 지하수를 끌어올리는 양수기', '풍력을 이용한 물 저장 장치', '빗물을 모아 식수로 정화하는 장치'],
+        answer: 1,
+        explain: 'Money Maker Pump는 발로 밟는 페달로 작동하는 양수기예요! 전기 없이 땅속 물을 끌어올려 농업용수로 활용해요.'
+      },
+      {
+        emoji: '🌟',
+        q: 'Gravity Light(중력 조명)은 어떻게 전기를 만드나요?',
+        hint: '무거운 물체가 떨어지는 힘을 이용해요.',
+        choices: ['태양빛을 이용해서', '물이 떨어지는 힘으로', '무거운 추가 천천히 떨어지는 중력 에너지로 LED 조명을 켬', '바람의 힘으로'],
+        answer: 2,
+        explain: 'Gravity Light는 무거운 추(돌이나 모래)가 천천히 떨어지는 중력 에너지를 전기로 변환해 LED 조명을 켜는 장치예요!'
+      },
+      {
+        emoji: '🌀',
+        q: 'GiraDora(지라도라)는 어떤 적정기술인가요?',
+        hint: '매일 필요한 가사 활동과 관련이 있어요.',
+        choices: ['태양열 조리기', '발로 밟아 작동하는 세탁기 겸 탈수기', '손으로 펌프질해 물을 올리는 장치', '빛을 모아 음식을 데우는 기구'],
+        answer: 1,
+        explain: 'GiraDora는 양동이 안에 세탁물을 넣고 발로 밟아 빨래도 하고 탈수도 하는 장치예요! 세탁기가 없는 지역에서 큰 도움이 돼요.'
+      },
+      {
+        emoji: '🌞',
+        q: 'Solar Grills(솔라 그릴)은 무엇에 에너지를 사용하나요?',
+        hint: '하늘에서 무한히 쏟아지는 에너지예요.',
+        choices: ['바람 에너지', '태양 에너지', '물 에너지', '중력 에너지'],
+        answer: 1,
+        explain: 'Solar Grills는 태양열을 모아 음식을 조리하는 장치예요! 연료 없이 태양에너지만으로 요리할 수 있어요.'
+      },
+      {
+        emoji: '🌐',
+        q: '유엔(UN)이 설정한 지속가능발전목표(SDGs)는 총 몇 가지인가요?',
+        hint: '교과서 그림에 여러 개의 색색 아이콘이 나와요.',
+        choices: ['10가지', '13가지', '17가지', '20가지'],
+        answer: 2,
+        explain: 'UN의 지속가능발전목표(SDGs)는 총 17가지예요! 빈곤 종식, 깨끗한 물, 양질의 교육, 기후 행동 등이 포함되어 있어요.'
+      },
+    ]
+  }
+];
+
+// ══════════════════════════════════════════════
+//  상태 변수
+// ══════════════════════════════════════════════
+let currentRoom = 0;
+let currentQ = 0;
+let score = 0;
+let roomScores = [0, 0, 0, 0, 0];
+let answered = false;
+
+// ══════════════════════════════════════════════
+//  화면 전환
+// ══════════════════════════════════════════════
+function show(id) {
+  ['titleScreen','roomIntroScreen','quizScreen','resultScreen'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════════
+//  게임 시작
+// ══════════════════════════════════════════════
+function startGame() {
+  currentRoom = 0;
+  currentQ = 0;
+  score = 0;
+  roomScores = [0, 0, 0, 0, 0];
+  showRoomIntro();
+}
+
+function showRoomIntro() {
+  const room = ROOMS[currentRoom];
+  document.getElementById('roomNumLabel').textContent = `ROOM ${room.id} / 5`;
+  document.getElementById('roomBigIcon').textContent = room.icon;
+  document.getElementById('roomTitleLabel').textContent = room.title;
+  document.getElementById('roomDescLabel').textContent = room.desc;
+
+  // 자물쇠 표시
+  const dots = document.getElementById('lockDotsEl');
+  dots.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const d = document.createElement('div');
+    d.className = 'lock-dot';
+    d.id = `dot_${i}`;
+    d.textContent = '🔒';
+    dots.appendChild(d);
+  }
+
+  show('roomIntroScreen');
+}
+
+function enterRoom() {
+  currentQ = 0;
+  answered = false;
+  showQuestion();
+  show('quizScreen');
+}
+
+// ══════════════════════════════════════════════
+//  문제 표시
+// ══════════════════════════════════════════════
+function showQuestion() {
+  const room = ROOMS[currentRoom];
+  const q = room.questions[currentQ];
+  const totalQ = currentRoom * 10 + currentQ + 1;
+  const pct = Math.round(((totalQ - 1) / 50) * 100);
+
+  document.getElementById('quizRoomBadge').textContent = `${room.icon} Room ${room.id}`;
+  document.getElementById('progText').textContent = `${currentQ + 1} / 10`;
+  document.getElementById('progPct').textContent = `전체 ${pct}%`;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('scoreEl').textContent = score;
+
+  document.getElementById('qNumEl').textContent = `Q${totalQ}`;
+  document.getElementById('qEmojiEl').textContent = q.emoji;
+  document.getElementById('qTextEl').textContent = q.q;
+  document.getElementById('qHintEl').textContent = `💬 힌트: ${q.hint}`;
+
+  // 선택지
+  const choicesEl = document.getElementById('choicesEl');
+  choicesEl.innerHTML = '';
+  const labels = ['①', '②', '③', '④'];
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-label">${labels[i]}</span>${c}`;
+    btn.onclick = () => selectAnswer(i);
+    choicesEl.appendChild(btn);
+  });
+
+  // 피드백/다음 버튼 숨김
+  document.getElementById('feedbackEl').classList.add('hidden');
+  document.getElementById('nextBtn').classList.add('hidden');
+  answered = false;
+}
+
+// ══════════════════════════════════════════════
+//  답 선택
+// ══════════════════════════════════════════════
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = ROOMS[currentRoom].questions[currentQ];
+  const btns = document.querySelectorAll('.choice-btn');
+  const isCorrect = idx === q.answer;
+
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.answer) b.classList.add('correct');
+    else if (i === idx) b.classList.add('wrong');
+  });
+
+  // 점수
+  if (isCorrect) {
+    score++;
+    roomScores[currentRoom]++;
+  }
+
+  document.getElementById('scoreEl').textContent = score;
+
+  // 피드백
+  const fb = document.getElementById('feedbackEl');
+  const fbTitle = document.getElementById('fbTitle');
+  const fbBody = document.getElementById('fbBody');
+
+  fb.className = `feedback-box ${isCorrect ? 'ok' : 'fail'}`;
+  fbTitle.textContent = isCorrect ? '🎉 정답! 자물쇠 하나가 열렸어요!' : '❌ 아쉬워요!';
+  fbBody.textContent = q.explain;
+  fb.classList.remove('hidden');
+
+  // 자물쇠 업데이트 (방 소개 화면의 dots)
+  const dot = document.getElementById(`dot_${currentQ}`);
+  if (dot) {
+    dot.textContent = isCorrect ? '✅' : '❌';
+    dot.style.background = isCorrect ? 'rgba(72,187,120,.4)' : 'rgba(229,62,62,.4)';
+  }
+
+  document.getElementById('nextBtn').classList.remove('hidden');
+
+  const nextBtn = document.getElementById('nextBtn');
+  if (currentQ === 9) {
+    if (currentRoom === 4) {
+      nextBtn.textContent = '🏁 최종 결과 보기!';
+    } else {
+      nextBtn.textContent = '🔓 방 탈출! 다음 방으로 →';
+    }
+  } else {
+    nextBtn.textContent = `다음 문제 → (${currentQ + 2}/10)`;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  다음 문제
+// ══════════════════════════════════════════════
+function nextQuestion() {
+  if (currentQ < 9) {
+    currentQ++;
+    showQuestion();
+  } else {
+    // 방 완료
+    showUnlock();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  방 탈출 팝업
+// ══════════════════════════════════════════════
+function showUnlock() {
+  const room = ROOMS[currentRoom];
+  const rs = roomScores[currentRoom];
+  const uscr = document.getElementById('unlockScreen');
+  const uIcon = document.getElementById('unlockIcon');
+  const uText = document.getElementById('unlockText');
+  const uSub = document.getElementById('unlockSub');
+  const uBtn = document.getElementById('unlockBtn');
+
+  let grade = rs >= 9 ? '완벽해요! 🏆' : rs >= 7 ? '훌륭해요! ⭐' : rs >= 5 ? '통과! 🔑' : '아슬아슬 탈출! 😅';
+
+  uIcon.textContent = rs >= 7 ? '🎊' : '🔓';
+  uText.textContent = `Room ${room.id} 탈출 성공!`;
+  uSub.textContent = `${room.icon} ${room.title} — ${rs} / 10점  ${grade}`;
+
+  if (currentRoom < 4) {
+    uBtn.textContent = `다음 방으로 → Room ${currentRoom + 2}`;
+    uBtn.onclick = () => {
+      uscr.classList.add('hidden');
+      currentRoom++;
+      showRoomIntro();
+    };
+  } else {
+    uBtn.textContent = '🏁 최종 결과 확인!';
+    uBtn.onclick = () => {
+      uscr.classList.add('hidden');
+      showResult();
+    };
+  }
+
+  uscr.classList.remove('hidden');
+  launchParticles();
+}
+
+// ══════════════════════════════════════════════
+//  최종 결과
+// ══════════════════════════════════════════════
+function showResult() {
+  document.getElementById('finalScore').textContent = score;
+
+  let icon, title, grade, gradeStyle;
+  if (score >= 45) {
+    icon = '🏆'; title = '천재 발명가 등극!'; grade = '🌟 S등급 — 완벽한 탈출!';
+    gradeStyle = 'background:linear-gradient(135deg,#ffd700,#f6ad55);color:#1a202c;';
+  } else if (score >= 40) {
+    icon = '🥇'; title = '탈출 성공!'; grade = '🎖️ A등급 — 훌륭해요!';
+    gradeStyle = 'background:linear-gradient(135deg,#48bb78,#276749);color:#fff;';
+  } else if (score >= 30) {
+    icon = '🥈'; title = '간신히 탈출!'; grade = '👍 B등급 — 잘했어요!';
+    gradeStyle = 'background:linear-gradient(135deg,#63b3ed,#2b6cb0);color:#fff;';
+  } else if (score >= 20) {
+    icon = '🥉'; title = '절반 탈출...'; grade = '📚 C등급 — 복습이 필요해요!';
+    gradeStyle = 'background:linear-gradient(135deg,#ed8936,#c05621);color:#fff;';
+  } else {
+    icon = '😵'; title = '탈출 실패!'; grade = '💪 D등급 — 다시 도전!';
+    gradeStyle = 'background:linear-gradient(135deg,#e53e3e,#9b2c2c);color:#fff;';
+  }
+
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultTitle').textContent = title;
+  const rg = document.getElementById('resultGrade');
+  rg.textContent = grade;
+  rg.style.cssText = gradeStyle;
+
+  // 방별 점수
+  const roomNames = ['⚙️기술역사', '🏭산업혁명', '📐표준화', '💡발명연구소', '🌍적정기술'];
+  const rrEl = document.getElementById('roomResultsEl');
+  rrEl.innerHTML = '';
+  roomScores.forEach((rs, i) => {
+    const card = document.createElement('div');
+    card.className = 'room-result-card';
+    const color = rs >= 8 ? '#68d391' : rs >= 6 ? '#63b3ed' : rs >= 4 ? '#f6ad55' : '#fc8181';
+    card.innerHTML = `
+      <div class="rrc-icon">${roomNames[i].slice(0,2)}</div>
+      <div class="rrc-name">${roomNames[i].slice(2)}</div>
+      <div class="rrc-score" style="color:${color}">${rs} / 10</div>
+    `;
+    rrEl.appendChild(card);
+  });
+
+  show('resultScreen');
+  if (score >= 40) launchParticles(true);
+}
+
+// ══════════════════════════════════════════════
+//  파티클 효과
+// ══════════════════════════════════════════════
+function launchParticles(big = false) {
+  const container = document.getElementById('particles');
+  const emojis = ['🎉','⭐','✨','🎊','🔑','💡','🏆','🌟'];
+  const count = big ? 20 : 10;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (2 + Math.random() * 3) + 's';
+      p.style.animationDelay = Math.random() * .5 + 's';
+      p.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+      container.appendChild(p);
+      setTimeout(() => p.remove(), 5000);
+    }, i * 100);
+  }
+}
+</script>
+</body>
+</html>
