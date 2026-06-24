@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중1 영어 3과 문장 퀴즈 – Different Attitudes, Different Results</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4ff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    width: 100%;
+    background: #2d5be3;
+    color: white;
+    text-align: center;
+    padding: 18px 10px 14px;
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; }
+  header p  { font-size: 0.9rem; margin-top: 4px; opacity: 0.85; }
+
+  #start-screen, #quiz-screen, #result-screen {
+    width: 100%;
+    max-width: 780px;
+    padding: 30px 20px;
+  }
+
+  /* ── START ── */
+  #start-screen { text-align: center; }
+  #start-screen h2 { font-size: 1.6rem; color: #2d5be3; margin-bottom: 12px; }
+  #start-screen p  { color: #555; margin-bottom: 24px; line-height: 1.6; }
+  .mode-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .mode-btn {
+    padding: 14px 28px;
+    border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: transform .15s, box-shadow .15s;
+  }
+  .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+  .mode-ko  { background: #2d5be3; color: white; }
+  .mode-en  { background: #e35d2d; color: white; }
+  .mode-mix { background: #2db37a; color: white; }
+
+  /* ── QUIZ ── */
+  #progress-bar-wrap {
+    background: #dde3f5;
+    border-radius: 8px;
+    height: 10px;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    background: #2d5be3;
+    border-radius: 8px;
+    transition: width .4s;
+  }
+  #q-meta { display: flex; justify-content: space-between; color: #666; font-size: .85rem; margin-bottom: 10px; }
+  #score-live { font-weight: 700; color: #2d5be3; }
+
+  #question-box {
+    background: white;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 18px rgba(45,91,227,.1);
+    margin-bottom: 20px;
+  }
+  #q-label {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #2d5be3;
+    margin-bottom: 8px;
+  }
+  #q-text {
+    font-size: 1.25rem;
+    color: #222;
+    line-height: 1.6;
+    font-weight: 600;
+    word-break: keep-all;
+  }
+
+  #choices { display: flex; flex-direction: column; gap: 12px; }
+  .choice-btn {
+    padding: 14px 18px;
+    border: 2px solid #dde3f5;
+    border-radius: 12px;
+    background: white;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s, background .15s;
+    line-height: 1.45;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: #2d5be3; background: #f0f4ff; }
+  .choice-btn.correct  { border-color: #2db37a; background: #eafaf3; color: #155724; font-weight: 700; }
+  .choice-btn.wrong    { border-color: #e35d2d; background: #fff2ee; color: #7a2b16; }
+  .choice-btn:disabled { cursor: default; }
+
+  #feedback-box {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: .95rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  #feedback-box.show-correct { display: block; background: #eafaf3; color: #155724; border: 1.5px solid #2db37a; }
+  #feedback-box.show-wrong   { display: block; background: #fff2ee; color: #7a2b16; border: 1.5px solid #e35d2d; }
+
+  #next-btn {
+    display: none;
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    background: #2d5be3;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  #next-btn:hover { background: #1d45c0; }
+
+  /* ── RESULT ── */
+  #result-screen { text-align: center; }
+  #result-screen h2 { font-size: 1.8rem; color: #2d5be3; margin-bottom: 8px; }
+  .score-circle {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: #2d5be3;
+    color: white;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 20px auto;
+    font-size: 2.4rem;
+    font-weight: 800;
+    box-shadow: 0 6px 24px rgba(45,91,227,.3);
+  }
+  .score-circle span { font-size: .9rem; font-weight: 400; opacity: .8; }
+  #result-msg { font-size: 1.1rem; color: #444; margin-bottom: 24px; line-height: 1.6; }
+  #review-list { text-align: left; margin-bottom: 28px; }
+  #review-list h3 { font-size: 1rem; color: #e35d2d; margin-bottom: 12px; }
+  .review-item {
+    background: white;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-left: 4px solid #e35d2d;
+    font-size: .9rem;
+    line-height: 1.5;
+  }
+  .review-item .q { color: #333; font-weight: 600; }
+  .review-item .a { color: #2db37a; margin-top: 4px; }
+
+  #restart-btn {
+    padding: 14px 32px;
+    background: #2d5be3;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #restart-btn:hover { background: #1d45c0; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎵 중1 영어 3과 – Let's Be Positive</h1>
+  <p>Different Attitudes, Different Results · 문장 퀴즈</p>
+</header>
+
+<!-- START -->
+<div id="start-screen">
+  <h2>퀴즈 시작</h2>
+  <p>본문 핵심 문장 <strong>30문제</strong>를 풀어봅시다.<br>모드를 선택하세요!</p>
+  <div class="mode-btns">
+    <button class="mode-btn mode-ko"  onclick="startQuiz('ko')">🇰🇷 한국어 → 영어</button>
+    <button class="mode-btn mode-en"  onclick="startQuiz('en')">🇺🇸 영어 → 한국어</button>
+    <button class="mode-btn mode-mix" onclick="startQuiz('mix')">🔀 랜덤 혼합</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen" class="hidden">
+  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+  <div id="q-meta">
+    <span id="q-num">1 / 30</span>
+    <span>점수: <span id="score-live">0</span></span>
+  </div>
+  <div id="question-box">
+    <div id="q-label"></div>
+    <div id="q-text"></div>
+  </div>
+  <div id="choices"></div>
+  <div id="feedback-box"></div>
+  <button id="next-btn" onclick="nextQuestion()">다음 문제 →</button>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="hidden">
+  <h2>퀴즈 완료! 🎉</h2>
+  <div class="score-circle">
+    <div id="final-score">0</div>
+    <span>/ 30점</span>
+  </div>
+  <div id="result-msg"></div>
+  <div id="review-list"></div>
+  <button id="restart-btn" onclick="location.reload()">다시 하기 🔄</button>
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+//  문장 데이터 (36개 – 본문 전체 핵심 문장)
+// ────────────────────────────────────────────────
+const ALL = [
+  { en: "Every year, Yuna's school holds a dance contest.", ko: "매년 유나의 학교는 댄스 대회를 개최한다." },
+  { en: "This year's contest is next month.", ko: "올해 대회는 다음 달에 있다." },
+  { en: "Let's make a team and enter the contest.", ko: "우리 팀을 만들어서 대회에 참가하자." },
+  { en: "Are you kidding?", ko: "농담하는 거지?" },
+  { en: "We're all terrible dancers.", ko: "우리는 모두 춤을 못 추잖아." },
+  { en: "I know, but I'm interested.", ko: "알아, 그렇지만 나는 관심이 가." },
+  { en: "Me, too. It'll be fun.", ko: "나도. 재미있을 거야." },
+  { en: "Let's do it. Sounds good, Suho?", ko: "한번 해 보자. 괜찮은 생각이지, 수호야?" },
+  { en: "I guess so.", ko: "그런 것 같아." },
+  { en: "What will happen next?", ko: "그 다음에는 무슨 일이 일어날까?" },
+  { en: "Yuna and her teammates are in the practice room, but no one looks happy.", ko: "유나와 팀원들은 연습실에 있지만, 아무도 즐거워 보이지 않는다." },
+  { en: "We're making too many mistakes.", ko: "우리는 실수를 너무 많이 하고 있어." },
+  { en: "Yeah. We're hopeless.", ko: "맞아. 우리는 가망이 없어." },
+  { en: "By the way, where's Minsu?", ko: "그나저나, 민수는 어딨어?" },
+  { en: "Well, he's sick. He texted me.", ko: "글쎄, 아프대. 나한테 문자했어." },
+  { en: "Really? I saw him last night, and he was all right.", ko: "정말? 내가 어젯밤에 민수 봤는데 그는 괜찮았어." },
+  { en: "The contest is tomorrow, but Yuna and her teammates are not practicing.", ko: "대회는 내일인데, 유나와 팀원들은 연습을 하고 있지 않다." },
+  { en: "I'm so tired.", ko: "나 너무 피곤해." },
+  { en: "We're not getting anywhere.", ko: "우리는 나아지지 않고 있어." },
+  { en: "We're just wasting our time.", ko: "우리는 시간 낭비만 하는 거라니까." },
+  { en: "The dance contest was not a good idea.", ko: "댄스 대회는 좋지 못한 생각이었어." },
+  { en: "I agree, but it's not your fault.", ko: "동의해, 하지만 이건 네 잘못은 아니야." },
+  { en: "Why don't we just quit?", ko: "우리 그냥 그만두는 게 어때?" },
+  { en: "After weeks of unhappy practices, they finally quit.", ko: "몇 주간의 불만족스러운 연습 후에, 그들은 마침내 관뒀다." },
+  { en: "They felt hopeless.", ko: "그들은 가망이 없다고 느꼈다." },
+  { en: "Yuna and her teammates are practicing hard in the practice room.", ko: "유나와 팀원들은 연습실에서 열심히 연습을 하고 있다." },
+  { en: "I made a mistake again. I'm sorry.", ko: "난 또 실수했어. 미안해." },
+  { en: "Cheer up! You can do it.", ko: "힘내! 너는 할 수 있어." },
+  { en: "Don't worry, Suho. We all make mistakes.", ko: "걱정 하지마, 수호야. 우리는 모두 실수해." },
+  { en: "Come on. Let's do it one more time!", ko: "자. 한 번 더 해 보자!" },
+  { en: "We're almost there.", ko: "우리 거의 다 왔어." },
+  { en: "The contest is over now.", ko: "대회는 지금 끝이 났다." },
+  { en: "Yuna's team didn't win any prizes, but they all look happy.", ko: "유나의 팀은 아무런 상도 받지 못했지만, 그들은 모두 행복해 보인다." },
+  { en: "Good job! We made it.", ko: "잘했어! 우리가 해냈어." },
+  { en: "We finished the dance without a big mistake. I feel great!", ko: "우리는 큰 실수 없이 춤을 끝냈어. 나는 기분이 좋아!" },
+  { en: "We did our best, and I'm so proud of all of us.", ko: "우리는 최선을 다했고, 난 우리 모두가 정말 자랑스러워." },
+  { en: "Thank you for your support, everyone.", ko: "모두들 응원해 줘서 고마워." },
+];
+
+const TOTAL = 30;
+
+// Fisher-Yates 셔플 (완전 무작위)
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let mode, questions, current, score, missed;
+
+function startQuiz(m) {
+  mode = m;
+  const pool = shuffle(ALL).slice(0, TOTAL);
+  questions = pool.map(s => {
+    const dir = m === 'mix' ? (Math.random() < 0.5 ? 'ko' : 'en') : m;
+    return { ...s, dir };
+  });
+  current = 0; score = 0; missed = [];
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('progress-bar').style.width = (current / TOTAL * 100) + '%';
+  document.getElementById('q-num').textContent = `${current + 1} / ${TOTAL}`;
+  document.getElementById('score-live').textContent = score;
+
+  const qText  = q.dir === 'ko' ? q.ko : q.en;
+  const ansKey = q.dir === 'ko' ? 'en' : 'ko';
+  document.getElementById('q-label').textContent =
+    q.dir === 'ko' ? '🇰🇷 한국어 → 영어로 번역하세요' : '🇺🇸 영어 → 한국어로 번역하세요';
+  document.getElementById('q-text').textContent = qText;
+
+  // 오답 보기: 현재 정답과 텍스트가 다른 항목에서 3개 뽑기
+  const correctAns = q[ansKey];
+  const wrongPool = shuffle(ALL.filter(s => s[ansKey] !== correctAns));
+  const wrongs = wrongPool.slice(0, 3);
+
+  // 정답을 0~3 중 랜덤 위치에 삽입
+  const pos = Math.floor(Math.random() * 4);
+  const opts = [...wrongs];
+  opts.splice(pos, 0, q);   // 정답 객체를 pos 위치에 삽입
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = opt[ansKey];
+    btn.onclick = () => select(btn, opt[ansKey], correctAns, q);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('feedback-box').className = '';
+  document.getElementById('next-btn').style.display = 'none';
+}
+
+function select(btn, chosen, correctAns, q) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback-box');
+
+  if (chosen === correctAns) {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-live').textContent = score;
+    fb.textContent = '✅ 정답입니다!';
+    fb.className = 'show-correct';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b.textContent === correctAns) b.classList.add('correct');
+    });
+    fb.innerHTML = `❌ 틀렸습니다.<br>정답: <strong>${correctAns}</strong>`;
+    fb.className = 'show-wrong';
+    const ansKey = q.dir === 'ko' ? 'en' : 'ko';
+    missed.push({ q: q.dir === 'ko' ? q.ko : q.en, a: correctAns });
+  }
+
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= TOTAL) showResult();
+  else renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+
+  document.getElementById('final-score').textContent = score;
+
+  let msg = '';
+  if (score === TOTAL)   msg = '완벽해요! 모든 문장을 다 알고 있군요! 🏆';
+  else if (score >= 27)  msg = '훌륭해요! 거의 완벽합니다! 👍';
+  else if (score >= 21)  msg = '잘 했어요! 틀린 문장들을 다시 복습해 보세요. 😊';
+  else if (score >= 15)  msg = '반 이상 맞혔어요! 조금 더 연습해 봐요. 💪';
+  else                   msg = '괜찮아요! 포기하지 말고 다시 도전해 봐요! 😊<br><em>"Cheer up! You can do it."</em>';
+  document.getElementById('result-msg').innerHTML = msg;
+
+  const rl = document.getElementById('review-list');
+  if (missed.length > 0) {
+    rl.innerHTML = `<h3>❌ 틀린 문장 복습 (${missed.length}개)</h3>`;
+    missed.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="q">Q: ${m.q}</div><div class="a">A: ${m.a}</div>`;
+      rl.appendChild(div);
+    });
+  } else {
+    rl.innerHTML = `<p style="color:#2db37a;font-weight:700;text-align:center;font-size:1.1rem">틀린 문제가 없어요! 완벽합니다! 🎉</p>`;
+  }
+}
+</script>
+</body>
+</html>
