@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중1 영어 4과 방탈출 – The Colorful Villages of the World</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0d1b2a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #e0e0e0;
+}
+header {
+  width: 100%;
+  background: linear-gradient(135deg, #1a3a5c, #0d1b2a);
+  text-align: center;
+  padding: 20px 10px 16px;
+  border-bottom: 2px solid #f0a500;
+}
+header h1 { font-size: 1.3rem; font-weight: 700; color: #f0a500; letter-spacing: 1px; }
+header p  { font-size: 0.85rem; margin-top: 4px; color: #aaa; }
+
+#start-screen, #quiz-screen, #result-screen {
+  width: 100%; max-width: 800px; padding: 30px 20px;
+}
+
+/* ── START ── */
+#start-screen { text-align: center; }
+.story-box {
+  background: #1a2f47;
+  border: 1px solid #f0a500;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  text-align: left;
+  line-height: 1.7;
+  color: #ccc;
+  font-size: 0.92rem;
+}
+.story-box h2 { color: #f0a500; font-size: 1.1rem; margin-bottom: 10px; }
+.village-cards {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
+}
+.village-card {
+  background: #1a2f47;
+  border: 1px solid #2a4a6a;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+  width: 155px;
+}
+.village-card .vc-icon { font-size: 1.8rem; }
+.village-card .vc-name { font-size: 0.82rem; color: #f0a500; font-weight: 700; margin-top: 4px; }
+.village-card .vc-sub  { font-size: 0.75rem; color: #888; margin-top: 2px; }
+.mode-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.mode-btn {
+  padding: 14px 28px; border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: transform .15s, box-shadow .15s; line-height: 1.5;
+}
+.mode-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+.mode-ko  { background: #1a3a5c; color: #f0a500; border: 1px solid #f0a500; }
+.mode-en  { background: #c0392b; color: white; }
+.mode-mix { background: #f0a500; color: #0d1b2a; }
+
+/* ── ROOM INDICATOR ── */
+.room-indicator { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.room-dot {
+  width: 36px; height: 36px; border-radius: 8px; border: 2px solid #555;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; background: #1a2f47; transition: all .3s;
+}
+.room-dot.active { border-color: #f0a500; background: #f0a500; }
+.room-dot.done   { border-color: #27ae60; background: #27ae60; }
+
+/* ── PROGRESS ── */
+#progress-bar-wrap {
+  background: #1a2f47; border-radius: 8px; height: 8px;
+  margin-bottom: 14px; overflow: hidden; border: 1px solid #2a4a6a;
+}
+#progress-bar {
+  height: 100%; background: linear-gradient(90deg, #c0392b, #f0a500);
+  border-radius: 8px; transition: width .4s;
+}
+#q-meta { display: flex; justify-content: space-between; color: #888; font-size: .82rem; margin-bottom: 10px; }
+#score-live { font-weight: 700; color: #f0a500; }
+#room-live  { font-weight: 700; color: #e74c3c; }
+
+/* ── QUESTION BOX ── */
+#question-box {
+  background: #1a2f47; border-radius: 16px; padding: 28px 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5); margin-bottom: 20px;
+  border: 1px solid #2a4a6a; position: relative;
+}
+#q-label {
+  font-size: .75rem; font-weight: 700; letter-spacing: 2px;
+  color: #f0a500; margin-bottom: 10px; text-transform: uppercase;
+}
+#q-text {
+  font-size: 1.12rem; font-weight: 600; line-height: 1.65; color: #f0f0f0; min-height: 60px;
+}
+.hint-icon { position: absolute; top: 14px; right: 18px; font-size: 1.3rem; opacity: 0.5; }
+
+/* ── OPTIONS ── */
+.option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+@media (max-width: 520px) { .option-grid { grid-template-columns: 1fr; } }
+.opt-btn {
+  padding: 14px 16px; border: 2px solid #2a4a6a; border-radius: 12px;
+  background: #1a2f47; color: #ddd; font-size: 0.88rem; font-weight: 500;
+  cursor: pointer; transition: all .18s; text-align: left; line-height: 1.45;
+}
+.opt-btn:hover:not(:disabled) { border-color: #f0a500; background: #1e3a5a; color: white; }
+.opt-btn.correct { border-color: #27ae60; background: #1a4a2e; color: #2ecc71; }
+.opt-btn.wrong   { border-color: #e74c3c; background: #4a1a1a; color: #e74c3c; }
+
+/* ── FEEDBACK ── */
+#feedback {
+  text-align: center; padding: 14px; border-radius: 12px;
+  font-weight: 600; font-size: 1rem; display: none; margin-bottom: 14px;
+}
+#feedback.show-correct { display: block; background: #1a4a2e; color: #2ecc71; border: 1px solid #2ecc71; }
+#feedback.show-wrong   { display: block; background: #4a1a1a; color: #e74c3c; border: 1px solid #e74c3c; }
+
+/* ── ROOM CLEAR ── */
+#room-clear {
+  display: none; text-align: center; background: #1a2f47;
+  border: 2px solid #f0a500; border-radius: 16px; padding: 32px 24px;
+  animation: popIn .4s ease;
+}
+#room-clear.show { display: block; }
+@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.unlock-icon { font-size: 4rem; }
+#room-clear h2 { color: #f0a500; font-size: 1.4rem; margin: 12px 0 8px; }
+#room-clear p  { color: #aaa; margin-bottom: 20px; }
+.next-room-btn {
+  padding: 12px 30px; background: #f0a500; color: #0d1b2a;
+  border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: transform .15s;
+}
+.next-room-btn:hover { transform: translateY(-2px); }
+
+/* ── RESULT ── */
+#result-screen { text-align: center; display: none; }
+.result-box {
+  background: #1a2f47; border: 2px solid #f0a500;
+  border-radius: 18px; padding: 36px 28px; margin-bottom: 20px;
+}
+.trophy { font-size: 4.5rem; }
+.result-box h2 { color: #f0a500; font-size: 1.5rem; margin: 14px 0 8px; }
+.score-big { font-size: 2.8rem; font-weight: 700; color: white; }
+.score-sub { color: #aaa; font-size: .9rem; margin-top: 4px; }
+.grade-bar-wrap { margin: 20px 0; background: #0d1b2a; border-radius: 8px; height: 14px; overflow: hidden; }
+.grade-bar { height: 100%; background: linear-gradient(90deg,#c0392b,#f0a500); border-radius: 8px; transition: width 1s ease; }
+.result-grade { font-size: 1.6rem; font-weight: 700; color: #f0a500; margin: 10px 0 4px; }
+.result-msg   { color: #bbb; font-size: .92rem; margin-bottom: 24px; }
+.result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.result-btn {
+  padding: 12px 26px; border-radius: 10px; border: none;
+  font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .15s;
+}
+.result-btn:hover { transform: translateY(-2px); }
+.btn-retry { background: #c0392b; color: white; }
+.btn-home  { background: #1a3a5c; color: #f0a500; border: 1px solid #f0a500; }
+.btn-mode  { background: #f0a500; color: #0d1b2a; }
+.log-section { margin-top: 20px; text-align: left; }
+.log-section h3 { color: #f0a500; margin-bottom: 12px; font-size: 1rem; }
+.log-item {
+  background: #1a2f47; border-radius: 10px; padding: 12px 16px;
+  margin-bottom: 8px; border-left: 4px solid; font-size: .85rem; line-height: 1.5;
+}
+.log-item.fail { border-color: #e74c3c; }
+.log-q { color: #ccc; }
+.log-a { color: #aaa; margin-top: 3px; }
+.log-a span { color: #2ecc71; font-weight: 600; }
+.log-a .wrong-ans { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✈️ 중1 영어 4과 방탈출 퀴즈</h1>
+  <p>The Joy of Traveling – The Colorful Villages of the World</p>
+</header>
+
+<!-- ─── START ─── -->
+<div id="start-screen">
+  <div class="story-box">
+    <h2>🗺️ 미션 브리핑</h2>
+    <p>
+      세 개의 다채로운 마을에서 온 편지를 완벽히 해독해야 탈출할 수 있다!<br>
+      🇪🇸 <strong>스페인 론다</strong> → 🇲🇦 <strong>모로코 쉐프샤우엔</strong> → 🇰🇷 <strong>한국 보라섬</strong><br><br>
+      <strong>총 3개의 방</strong>, 각 방 10문제 – 30문제를 모두 풀면 세계 여행 완료!
+    </p>
+  </div>
+
+  <div class="village-cards">
+    <div class="village-card">
+      <div class="vc-icon">🏛️</div>
+      <div class="vc-name">스페인 론다</div>
+      <div class="vc-sub">방 1 (1~10번)</div>
+    </div>
+    <div class="village-card">
+      <div class="vc-icon">🟦</div>
+      <div class="vc-name">모로코 쉐프샤우엔</div>
+      <div class="vc-sub">방 2 (11~20번)</div>
+    </div>
+    <div class="village-card">
+      <div class="vc-icon">💜</div>
+      <div class="vc-name">한국 보라섬</div>
+      <div class="vc-sub">방 3 (21~30번)</div>
+    </div>
+  </div>
+
+  <div class="mode-btns">
+    <button class="mode-btn mode-ko"  onclick="startQuiz('ko')">🇰🇷 한→영 모드<br><small style="font-weight:400">Korean → English</small></button>
+    <button class="mode-btn mode-en"  onclick="startQuiz('en')">🇬🇧 영→한 모드<br><small style="font-weight:400">English → Korean</small></button>
+    <button class="mode-btn mode-mix" onclick="startQuiz('mix')">🎲 랜덤 모드<br><small style="font-weight:400">Mixed</small></button>
+  </div>
+</div>
+
+<!-- ─── QUIZ ─── -->
+<div id="quiz-screen" style="display:none">
+  <div class="room-indicator">
+    <div class="room-dot" id="dot-0">🏛️</div>
+    <div class="room-dot" id="dot-1">🟦</div>
+    <div class="room-dot" id="dot-2">💜</div>
+  </div>
+
+  <div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+  <div id="q-meta">
+    <span id="room-live">방 1</span>
+    <span>문제 <span id="q-num">1</span>/30</span>
+    <span id="score-live">점수: 0</span>
+  </div>
+
+  <div id="question-box">
+    <div id="q-label">다음을 번역하세요</div>
+    <div class="hint-icon" id="hint-icon">✈️</div>
+    <div id="q-text"></div>
+  </div>
+
+  <div class="option-grid" id="option-grid"></div>
+  <div id="feedback"></div>
+
+  <div id="room-clear">
+    <div class="unlock-icon" id="unlock-icon">🔓</div>
+    <h2 id="room-clear-title">방 탈출 성공!</h2>
+    <p id="room-clear-msg">다음 마을로 이동합니다...</p>
+    <button class="next-room-btn" id="next-room-btn" onclick="nextRoom()">다음 방으로 →</button>
+  </div>
+</div>
+
+<!-- ─── RESULT ─── -->
+<div id="result-screen">
+  <div class="result-box">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2>세계 여행 완료!</h2>
+    <div class="score-big"><span id="final-score">0</span> / 30</div>
+    <div class="score-sub">정답 <span id="final-correct">0</span>개 · 오답 <span id="final-wrong">0</span>개</div>
+    <div class="grade-bar-wrap"><div class="grade-bar" id="grade-bar" style="width:0%"></div></div>
+    <div class="result-grade" id="result-grade">?</div>
+    <div class="result-msg"  id="result-msg"></div>
+  </div>
+  <div class="result-btns">
+    <button class="result-btn btn-retry" onclick="retryMode()">🔄 다시 도전</button>
+    <button class="result-btn btn-home"  onclick="goHome()">🏠 처음으로</button>
+    <button class="result-btn btn-mode"  onclick="goHome()">🎯 모드 선택</button>
+  </div>
+  <div class="log-section">
+    <h3>📋 오답 노트</h3>
+    <div id="answer-log"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// 본문 문장 30쌍 (PDF 원문 기반)
+// ─────────────────────────────────────────
+const ALL_PAIRS = [
+  // ── 스페인 론다 (민지 → 수미) ──
+  { en: "Yesterday, my family and I came to Ronda in Spain.",
+    ko: "어제 우리 가족과 나는 스페인의 론다에 왔어." },
+  { en: "Most buildings here are white, and they are so beautiful against the blue sky.",
+    ko: "여기에 있는 대부분의 건물들은 하얀색이고, 파란 하늘과 대비되어 정말 아름다워." },
+  { en: "And the views! Ronda is on cliffs, so the views are fantastic.",
+    ko: "그리고 경치도! 론다는 절벽 위에 있어서 경치가 환상적이야." },
+  { en: "Now, we're eating lunch on the terrace of a restaurant.",
+    ko: "지금, 우리는 식당 테라스에서 점심을 먹고 있어." },
+  { en: "All the food here is great, but I especially like the churros.",
+    ko: "이곳의 모든 음식이 훌륭하지만, 나는 특히 추로스가 좋아." },
+  { en: "After lunch, we're going to visit the Ernest Hemingway Walk.",
+    ko: "점심 후에, 우리는 Ernest Hemingway 산책로를 방문할 예정이야." },
+  { en: "Hemingway loved Ronda and spent many summers here.",
+    ko: "Hemingway는 론다를 매우 좋아했고 이곳에서 여러 번의 여름을 보냈어." },
+
+  // ── 모로코 쉐프샤우엔 (Jay 삼촌 → 인호) ──
+  { en: "I'm in Chefchaouen, the Blue Pearl of Morocco.",
+    ko: "나는 모로코의 푸른 진주, 쉐프샤우엔에 있어." },
+  { en: "All day long, I enjoyed taking pictures of the blue streets and blue buildings.",
+    ko: "하루 종일 나는 파란색 길과 파란색 건물들의 사진을 찍는 것을 즐겼어." },
+  { en: "I also enjoyed walking through the narrow streets.",
+    ko: "나는 좁은 길 사이를 걸어 다니는 것도 즐거웠어." },
+  { en: "They were full of interesting shops, and I bought some souvenirs.",
+    ko: "그곳은 흥미로운 가게들로 가득 차 있었고, 나는 기념품도 몇 개 샀지." },
+  { en: "Now, I'm drinking mint tea at a tea house, just like the locals.",
+    ko: "지금은, 나는 현지인들처럼 찻집에서 민트 차를 마시고 있어." },
+  { en: "Chefchaouen is famous for its sunrises.",
+    ko: "쉐프샤우엔은 일출로 유명해." },
+  { en: "Tomorrow, I'm going to get up early and enjoy a beautiful sunrise.",
+    ko: "내일, 나는 일찍 일어나서 아름다운 일출을 즐겨 보려고 해." },
+
+  // ── 한국 보라섬 (Amy → 엄마) ──
+  { en: "I'm on Purple Island in Korea.",
+    ko: "저는 한국의 보라섬에 있어요." },
+  { en: "Almost everything here is purple - the houses, the buses, and even the bridges.",
+    ko: "이곳은 거의 모든 것이 보라색이에요 – 집, 버스, 그리고 심지어 다리까지요." },
+  { en: "Purple is my favorite color, so the island is just perfect for me.",
+    ko: "보라색은 제가 제일 좋아하는 색이라, 이 섬은 저에게 완벽한 곳이에요." },
+  { en: "I didn't even pay the entrance fee to the island. Why?",
+    ko: "저는 이 섬의 입장료도 내지 않았어요. 왜냐고요?" },
+  { en: "I was wearing a purple T-shirt.",
+    ko: "제가 보라색 티셔츠를 입고 있었기 때문이에요." },
+  { en: "Now, I'm on my way to a bike rental shop.",
+    ko: "지금, 저는 자전거 대여소로 가는 중이에요." },
+  { en: "The island is not big, so I'm going to explore it by bicycle.",
+    ko: "이 섬은 크지 않아서, 저는 자전거로 돌아다니면서 답사할 거예요." },
+  { en: "I'm especially looking forward to visiting the Lavender Garden.",
+    ko: "저는 특히 라벤더 정원에 방문하는 것이 기대돼요." },
+
+  // ── 핵심 문장 복습 (총 30개 구성) ──
+  { en: "Ronda is on cliffs, so the views are fantastic.",
+    ko: "론다는 절벽 위에 있어서 경치가 환상적이야." },
+  { en: "Most buildings here are white.",
+    ko: "여기에 있는 대부분의 건물들은 하얀색이야." },
+  { en: "I enjoyed taking pictures of the blue streets.",
+    ko: "나는 파란색 길의 사진을 찍는 것을 즐겼어." },
+  { en: "They were full of interesting shops.",
+    ko: "그곳은 흥미로운 가게들로 가득 차 있었어." },
+  { en: "Almost everything here is purple.",
+    ko: "이곳은 거의 모든 것이 보라색이에요." },
+  { en: "The island is not big.",
+    ko: "이 섬은 크지 않아요." },
+  { en: "I'm going to explore the island by bicycle.",
+    ko: "나는 자전거로 섬을 돌아다니면서 답사할 거예요." },
+  { en: "I'm especially looking forward to visiting the Lavender Garden.",
+    ko: "저는 특히 라벤더 정원에 방문하는 것이 기대돼요." },
+]; // 총 30쌍
+
+// ─────────────────────────────────────────
+const ROOMS = [
+  { name: "방 1 – 스페인 론다",       icon: "🏛️", msg: "론다를 탈출했습니다! 다음은 쉐프샤우엔으로!" },
+  { name: "방 2 – 모로코 쉐프샤우엔", icon: "🟦", msg: "쉐프샤우엔을 탈출했습니다! 마지막 목적지, 보라섬으로!" },
+  { name: "방 3 – 한국 보라섬",        icon: "💜", msg: "세계 여행 완료! 모든 다채로운 마을을 방문했습니다!" },
+];
+
+let questions = [], current = 0, score = 0, answered = false, log = [], currentMode = 'ko';
+
+function getRoomIndex(q) { return Math.floor(q / 10); }
+
+function buildQuestions(m) {
+  const shuffled = shuffle([...ALL_PAIRS]);
+  return shuffled.map(pair => {
+    let dir;
+    if (m === 'ko')  dir = 'ko2en';
+    else if (m === 'en') dir = 'en2ko';
+    else dir = Math.random() < 0.5 ? 'ko2en' : 'en2ko';
+
+    const question = dir === 'ko2en' ? pair.ko : pair.en;
+    const answer   = dir === 'ko2en' ? pair.en : pair.ko;
+    const wrongPool = ALL_PAIRS
+      .filter(p => p !== pair)
+      .map(p => dir === 'ko2en' ? p.en : p.ko);
+    const wrongs  = shuffle(wrongPool).slice(0, 3);
+    const options = shuffle([answer, ...wrongs]);
+    return { question, answer, options, dir };
+  });
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(m) {
+  currentMode = m;
+  questions = buildQuestions(m);
+  current = 0; score = 0; log = [];
+  document.getElementById('start-screen').style.display  = 'none';
+  document.getElementById('quiz-screen').style.display   = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('room-clear').classList.remove('show');
+  updateRoomDots(0);
+  renderQuestion();
+}
+
+function renderQuestion() {
+  document.getElementById('room-clear').classList.remove('show');
+  const q = questions[current];
+  const roomIdx = getRoomIndex(current);
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+  document.getElementById('room-live').textContent = ROOMS[roomIdx].name;
+  document.getElementById('progress-bar').style.width = ((current / 30) * 100) + '%';
+  document.getElementById('q-label').textContent =
+    q.dir === 'ko2en' ? '🇰🇷 한국어 → 영어로 번역하세요' : '🇬🇧 영어 → 한국어로 번역하세요';
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('hint-icon').textContent = ['🇪🇸','🇲🇦','🇰🇷'][roomIdx];
+
+  const grid = document.getElementById('option-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn, q);
+    grid.appendChild(btn);
+  });
+  document.getElementById('feedback').className = '';
+  answered = false;
+  updateRoomDots(roomIdx);
+}
+
+function selectAnswer(opt, btn, q) {
+  if (answered) return;
+  answered = true;
+  const correct = opt === q.answer;
+  if (correct) score++;
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.classList.add('correct');
+  });
+  if (!correct) btn.classList.add('wrong');
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    fb.className = 'show-correct';
+    fb.textContent = '✅ 정답! 다음 단서를 확보했습니다!';
+  } else {
+    fb.className = 'show-wrong';
+    fb.textContent = `❌ 오답! 정답: ${q.answer}`;
+  }
+  log.push({ question: q.question, answer: q.answer, chosen: opt, correct, dir: q.dir });
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+  setTimeout(() => {
+    current++;
+    if (current === 30) { showResult(); return; }
+    const prevRoom = getRoomIndex(current - 1);
+    const thisRoom = getRoomIndex(current);
+    if (thisRoom !== prevRoom) showRoomClear(prevRoom);
+    else renderQuestion();
+  }, 1400);
+}
+
+function showRoomClear(roomIdx) {
+  const r = ROOMS[roomIdx];
+  document.getElementById('unlock-icon').textContent = r.icon;
+  document.getElementById('room-clear-title').textContent = `${r.name} 탈출 성공! 🎉`;
+  document.getElementById('room-clear-msg').textContent = r.msg;
+  const nextRoom = ROOMS[roomIdx + 1];
+  if (nextRoom) document.getElementById('next-room-btn').textContent = `${nextRoom.icon} ${nextRoom.name}으로 →`;
+  document.getElementById('room-clear').classList.add('show');
+  const dot = document.getElementById(`dot-${roomIdx}`);
+  dot.classList.remove('active'); dot.classList.add('done'); dot.textContent = '✅';
+}
+
+function nextRoom() {
+  document.getElementById('room-clear').classList.remove('show');
+  renderQuestion();
+}
+
+function updateRoomDots(roomIdx) {
+  [0,1,2].forEach(i => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (i < roomIdx) { dot.classList.remove('active'); dot.classList.add('done'); dot.textContent = '✅'; }
+    else if (i === roomIdx) { dot.classList.add('active'); dot.classList.remove('done'); dot.textContent = ROOMS[i].icon; }
+    else { dot.classList.remove('active','done'); dot.textContent = ROOMS[i].icon; }
+  });
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display  = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  const pct = Math.round((score / 30) * 100);
+  document.getElementById('final-score').textContent   = score;
+  document.getElementById('final-correct').textContent = score;
+  document.getElementById('final-wrong').textContent   = 30 - score;
+  setTimeout(() => { document.getElementById('grade-bar').style.width = pct + '%'; }, 100);
+  let grade, msg, trophy;
+  if      (pct >= 97) { grade='S 🏆'; msg='완벽한 세계 여행! 당신은 진정한 여행 전문가!'; trophy='🏆'; }
+  else if (pct >= 90) { grade='A 🥇'; msg='훌륭해요! 세 마을 모두 완벽히 기억하고 있네요!'; trophy='🥇'; }
+  else if (pct >= 77) { grade='B 🥈'; msg='좋아요! 조금만 더 연습하면 완벽!'; trophy='🥈'; }
+  else if (pct >= 60) { grade='C 🥉'; msg='여행은 완료! 하지만 놓친 장면들이 있어요.'; trophy='🥉'; }
+  else                { grade='D ✈️'; msg='다시 한 번 세계 여행을 떠나 봐요!'; trophy='✈️'; }
+  document.getElementById('trophy').textContent = trophy;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-msg').textContent = `${pct}점 (${msg})`;
+  const logDiv = document.getElementById('answer-log');
+  const wrongs = log.filter(l => !l.correct);
+  if (wrongs.length === 0) {
+    logDiv.innerHTML = '<p style="color:#2ecc71;text-align:center;">🎉 오답이 없습니다! 만점!</p>';
+  } else {
+    logDiv.innerHTML = wrongs.map(l => `
+      <div class="log-item fail">
+        <div class="log-q">${l.dir==='ko2en'?'🇰🇷':'🇬🇧'} ${l.question}</div>
+        <div class="log-a">내 답: <span class="wrong-ans">${l.chosen}</span></div>
+        <div class="log-a">정답: <span>${l.answer}</span></div>
+      </div>`).join('');
+  }
+}
+
+function retryMode() { startQuiz(currentMode); }
+function goHome() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display  = 'block';
+}
+</script>
+</body>
+</html>
