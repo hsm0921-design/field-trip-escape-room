@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중1 영어 2과 방탈출 – Eat, Play and Live Well!</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0d1b2a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #e0e0e0;
+}
+header {
+  width: 100%;
+  background: linear-gradient(135deg, #1a3a5c, #0d1b2a);
+  text-align: center;
+  padding: 20px 10px 16px;
+  border-bottom: 2px solid #f0a500;
+}
+header h1 { font-size: 1.3rem; font-weight: 700; color: #f0a500; letter-spacing: 1px; }
+header p  { font-size: 0.85rem; margin-top: 4px; color: #aaa; }
+
+#start-screen, #quiz-screen, #result-screen {
+  width: 100%; max-width: 800px; padding: 30px 20px;
+}
+
+/* ── START ── */
+#start-screen { text-align: center; }
+.story-box {
+  background: #1a2f47;
+  border: 1px solid #f0a500;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  text-align: left;
+  line-height: 1.7;
+  color: #ccc;
+  font-size: 0.92rem;
+}
+.story-box h2 { color: #f0a500; font-size: 1.1rem; margin-bottom: 10px; }
+.chef-cards {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
+}
+.chef-card {
+  background: #1a2f47;
+  border: 1px solid #2a4a6a;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+  width: 160px;
+}
+.chef-card .cc-icon { font-size: 1.8rem; }
+.chef-card .cc-name { font-size: 0.82rem; color: #f0a500; font-weight: 700; margin-top: 4px; }
+.chef-card .cc-sub  { font-size: 0.75rem; color: #888; margin-top: 2px; }
+.mode-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.mode-btn {
+  padding: 14px 28px; border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: transform .15s, box-shadow .15s; line-height: 1.5;
+}
+.mode-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+.mode-ko  { background: #1a3a5c; color: #f0a500; border: 1px solid #f0a500; }
+.mode-en  { background: #c0392b; color: white; }
+.mode-mix { background: #f0a500; color: #0d1b2a; }
+
+/* ── ROOM INDICATOR ── */
+.room-indicator { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.room-dot {
+  width: 36px; height: 36px; border-radius: 8px; border: 2px solid #555;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; background: #1a2f47; transition: all .3s;
+}
+.room-dot.active { border-color: #f0a500; background: #f0a500; }
+.room-dot.done   { border-color: #27ae60; background: #27ae60; }
+
+/* ── PROGRESS ── */
+#progress-bar-wrap {
+  background: #1a2f47; border-radius: 8px; height: 8px;
+  margin-bottom: 14px; overflow: hidden; border: 1px solid #2a4a6a;
+}
+#progress-bar {
+  height: 100%; background: linear-gradient(90deg, #c0392b, #f0a500);
+  border-radius: 8px; transition: width .4s;
+}
+#q-meta { display: flex; justify-content: space-between; color: #888; font-size: .82rem; margin-bottom: 10px; }
+#score-live { font-weight: 700; color: #f0a500; }
+#room-live  { font-weight: 700; color: #e74c3c; }
+
+/* ── QUESTION BOX ── */
+#question-box {
+  background: #1a2f47; border-radius: 16px; padding: 28px 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5); margin-bottom: 20px;
+  border: 1px solid #2a4a6a; position: relative;
+}
+#q-label {
+  font-size: .75rem; font-weight: 700; letter-spacing: 2px;
+  color: #f0a500; margin-bottom: 10px; text-transform: uppercase;
+}
+#q-text {
+  font-size: 1.12rem; font-weight: 600; line-height: 1.65; color: #f0f0f0; min-height: 60px;
+}
+.hint-icon { position: absolute; top: 14px; right: 18px; font-size: 1.3rem; opacity: 0.5; }
+
+/* ── OPTIONS ── */
+.option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+@media (max-width: 520px) { .option-grid { grid-template-columns: 1fr; } }
+.opt-btn {
+  padding: 14px 16px; border: 2px solid #2a4a6a; border-radius: 12px;
+  background: #1a2f47; color: #ddd; font-size: 0.88rem; font-weight: 500;
+  cursor: pointer; transition: all .18s; text-align: left; line-height: 1.45;
+}
+.opt-btn:hover:not(:disabled) { border-color: #f0a500; background: #1e3a5a; color: white; }
+.opt-btn.correct { border-color: #27ae60; background: #1a4a2e; color: #2ecc71; }
+.opt-btn.wrong   { border-color: #e74c3c; background: #4a1a1a; color: #e74c3c; }
+
+/* ── FEEDBACK ── */
+#feedback {
+  text-align: center; padding: 14px; border-radius: 12px;
+  font-weight: 600; font-size: 1rem; display: none; margin-bottom: 14px;
+}
+#feedback.show-correct { display: block; background: #1a4a2e; color: #2ecc71; border: 1px solid #2ecc71; }
+#feedback.show-wrong   { display: block; background: #4a1a1a; color: #e74c3c; border: 1px solid #e74c3c; }
+
+/* ── ROOM CLEAR ── */
+#room-clear {
+  display: none; text-align: center; background: #1a2f47;
+  border: 2px solid #f0a500; border-radius: 16px; padding: 32px 24px;
+  animation: popIn .4s ease;
+}
+#room-clear.show { display: block; }
+@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.unlock-icon { font-size: 4rem; }
+#room-clear h2 { color: #f0a500; font-size: 1.4rem; margin: 12px 0 8px; }
+#room-clear p  { color: #aaa; margin-bottom: 20px; }
+.next-room-btn {
+  padding: 12px 30px; background: #f0a500; color: #0d1b2a;
+  border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: transform .15s;
+}
+.next-room-btn:hover { transform: translateY(-2px); }
+
+/* ── RESULT ── */
+#result-screen { text-align: center; display: none; }
+.result-box {
+  background: #1a2f47; border: 2px solid #f0a500;
+  border-radius: 18px; padding: 36px 28px; margin-bottom: 20px;
+}
+.trophy { font-size: 4.5rem; }
+.result-box h2 { color: #f0a500; font-size: 1.5rem; margin: 14px 0 8px; }
+.score-big { font-size: 2.8rem; font-weight: 700; color: white; }
+.score-sub { color: #aaa; font-size: .9rem; margin-top: 4px; }
+.grade-bar-wrap { margin: 20px 0; background: #0d1b2a; border-radius: 8px; height: 14px; overflow: hidden; }
+.grade-bar { height: 100%; background: linear-gradient(90deg,#c0392b,#f0a500); border-radius: 8px; transition: width 1s ease; }
+.result-grade { font-size: 1.6rem; font-weight: 700; color: #f0a500; margin: 10px 0 4px; }
+.result-msg   { color: #bbb; font-size: .92rem; margin-bottom: 24px; }
+.result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.result-btn {
+  padding: 12px 26px; border-radius: 10px; border: none;
+  font-size: .95rem; font-weight: 600; cursor: pointer; transition: transform .15s;
+}
+.result-btn:hover { transform: translateY(-2px); }
+.btn-retry { background: #c0392b; color: white; }
+.btn-home  { background: #1a3a5c; color: #f0a500; border: 1px solid #f0a500; }
+.btn-mode  { background: #f0a500; color: #0d1b2a; }
+.log-section { margin-top: 20px; text-align: left; }
+.log-section h3 { color: #f0a500; margin-bottom: 12px; font-size: 1rem; }
+.log-item {
+  background: #1a2f47; border-radius: 10px; padding: 12px 16px;
+  margin-bottom: 8px; border-left: 4px solid; font-size: .85rem; line-height: 1.5;
+}
+.log-item.fail { border-color: #e74c3c; }
+.log-q { color: #ccc; }
+.log-a { color: #aaa; margin-top: 3px; }
+.log-a span { color: #2ecc71; font-weight: 600; }
+.log-a .wrong-ans { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍽️ 중1 영어 2과 방탈출 퀴즈</h1>
+  <p>Eat, Play and Live Well! – Healthy and Yummy Snacks for You</p>
+</header>
+
+<!-- ─── START ─── -->
+<div id="start-screen">
+  <div class="story-box">
+    <h2>👨‍🍳 미션 브리핑</h2>
+    <p>
+      Teens' Kitchen에 세 명의 십 대 요리사들이 나타났다!<br>
+      🇮🇹 <strong>Bella의 카프레제 꼬치</strong> → 🇰🇷 <strong>Mina의 두부 칩</strong> → 🇧🇷 <strong>Miguel의 아사이 볼</strong><br><br>
+      <strong>총 3개의 방</strong>, 각 방 10문제 – 30문제를 모두 풀면 주방 탈출 완료!
+    </p>
+  </div>
+
+  <div class="chef-cards">
+    <div class="chef-card">
+      <div class="cc-icon">🥗</div>
+      <div class="cc-name">Bella (이탈리아)</div>
+      <div class="cc-sub">방 1 – 카프레제 꼬치</div>
+    </div>
+    <div class="chef-card">
+      <div class="cc-icon">🥢</div>
+      <div class="cc-name">Mina (한국)</div>
+      <div class="cc-sub">방 2 – 두부 칩</div>
+    </div>
+    <div class="chef-card">
+      <div class="cc-icon">🍇</div>
+      <div class="cc-name">Miguel (브라질)</div>
+      <div class="cc-sub">방 3 – 아사이 볼</div>
+    </div>
+  </div>
+
+  <div class="mode-btns">
+    <button class="mode-btn mode-ko"  onclick="startQuiz('ko')">🇰🇷 한→영 모드<br><small style="font-weight:400">Korean → English</small></button>
+    <button class="mode-btn mode-en"  onclick="startQuiz('en')">🇬🇧 영→한 모드<br><small style="font-weight:400">English → Korean</small></button>
+    <button class="mode-btn mode-mix" onclick="startQuiz('mix')">🎲 랜덤 모드<br><small style="font-weight:400">Mixed</small></button>
+  </div>
+</div>
+
+<!-- ─── QUIZ ─── -->
+<div id="quiz-screen" style="display:none">
+  <div class="room-indicator">
+    <div class="room-dot" id="dot-0">🥗</div>
+    <div class="room-dot" id="dot-1">🥢</div>
+    <div class="room-dot" id="dot-2">🍇</div>
+  </div>
+
+  <div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+  <div id="q-meta">
+    <span id="room-live">방 1</span>
+    <span>문제 <span id="q-num">1</span>/30</span>
+    <span id="score-live">점수: 0</span>
+  </div>
+
+  <div id="question-box">
+    <div id="q-label">다음을 번역하세요</div>
+    <div class="hint-icon" id="hint-icon">🍽️</div>
+    <div id="q-text"></div>
+  </div>
+
+  <div class="option-grid" id="option-grid"></div>
+  <div id="feedback"></div>
+
+  <div id="room-clear">
+    <div class="unlock-icon" id="unlock-icon">🔓</div>
+    <h2 id="room-clear-title">방 탈출 성공!</h2>
+    <p id="room-clear-msg">다음 요리사에게 이동합니다...</p>
+    <button class="next-room-btn" id="next-room-btn" onclick="nextRoom()">다음 방으로 →</button>
+  </div>
+</div>
+
+<!-- ─── RESULT ─── -->
+<div id="result-screen">
+  <div class="result-box">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2>주방 탈출 완료!</h2>
+    <div class="score-big"><span id="final-score">0</span> / 30</div>
+    <div class="score-sub">정답 <span id="final-correct">0</span>개 · 오답 <span id="final-wrong">0</span>개</div>
+    <div class="grade-bar-wrap"><div class="grade-bar" id="grade-bar" style="width:0%"></div></div>
+    <div class="result-grade" id="result-grade">?</div>
+    <div class="result-msg"  id="result-msg"></div>
+  </div>
+  <div class="result-btns">
+    <button class="result-btn btn-retry" onclick="retryMode()">🔄 다시 도전</button>
+    <button class="result-btn btn-home"  onclick="goHome()">🏠 처음으로</button>
+    <button class="result-btn btn-mode"  onclick="goHome()">🎯 모드 선택</button>
+  </div>
+  <div class="log-section">
+    <h3>📋 오답 노트</h3>
+    <div id="answer-log"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// 본문 문장 30쌍 (PDF 원문 기반)
+// ─────────────────────────────────────────
+const ALL_PAIRS = [
+  // ── 방 1: Bella의 카프레제 꼬치 (이탈리아) ──
+  { en: "Welcome to Teens' Kitchen.",
+    ko: "Teens' Kitchen에 오신 것을 환영합니다." },
+  { en: "Today, we have three teen chefs on the show.",
+    ko: "오늘, 세 명의 십 대 요리사들이 프로그램에 나옵니다." },
+  { en: "They're making healthy and delicious snacks, and they will tell us about them.",
+    ko: "그들은 건강하고 맛있는 간식을 만들고 있고, 그들은 그것들에 대해 우리에게 이야기해 줄 것입니다." },
+  { en: "Bella: Ciao, I'm Bella from Italy.",
+    ko: "Bella: 안녕하세요, 저는 이탈리아에서 온 Bella입니다." },
+  { en: "I'm making caprese skewers.",
+    ko: "저는 카프레제 꼬치를 만들고 있어요." },
+  { en: "Anyone can make these.",
+    ko: "누구나 이것을 만들 수 있어요." },
+  { en: "You just need mozzarella cheese, cherry tomatoes, and basil leaves.",
+    ko: "여러분은 모차렐라 치즈, 방울토마토, 그리고 바질 잎만 있으면 돼요." },
+  { en: "Just put them on skewers, and they'll become healthy snacks.",
+    ko: "그것들을 꼬치에 꽂기만 하면, 그것들은 건강한 간식이 될 거예요." },
+  { en: "Caprese skewers are low in calories, so I often eat them as a light snack.",
+    ko: "카프레제 꼬치는 열량이 낮아서, 저는 가벼운 간식으로 자주 먹어요." },
+  { en: "Caprese skewers are low in calories.",
+    ko: "카프레제 꼬치는 열량이 낮아요." },
+
+  // ── 방 2: Mina의 두부 칩 (한국) ──
+  { en: "Mina: Hi, I'm Mina from Korea, and I'm baking tofu chips.",
+    ko: "미나: 안녕하세요, 저는 한국에서 온 미나이고, 두부 칩을 굽고 있어요." },
+  { en: "Unlike other chips, my tofu chips are healthy. Why?",
+    ko: "다른 칩들과는 다르게, 제 두부 칩은 건강에 좋아요. 왜냐고요?" },
+  { en: "I don't fry my chips but bake them.",
+    ko: "저는 두부 칩을 튀기지 않고 굽거든요." },
+  { en: "I don't use any flour, either.",
+    ko: "저는 밀가루도 사용하지 않아요." },
+  { en: "I use only tofu.",
+    ko: "저는 두부만 사용해요." },
+  { en: "Eat the tofu chips with honey or garlic powder.",
+    ko: "두부 칩을 꿀이나 마늘 가루와 같이 먹어 보세요." },
+  { en: "They'll taste good.",
+    ko: "그것들은 맛이 좋을 거예요." },
+  { en: "Unlike other chips, my tofu chips are healthy.",
+    ko: "다른 칩들과는 다르게, 제 두부 칩은 건강에 좋아요." },
+  { en: "I don't fry my chips.",
+    ko: "저는 두부 칩을 튀기지 않아요." },
+  { en: "I don't use any flour.",
+    ko: "저는 밀가루를 사용하지 않아요." },
+
+  // ── 방 3: Miguel의 아사이 볼 (브라질) ──
+  { en: "Miguel: Hello, everyone.",
+    ko: "Miguel: 안녕하세요, 여러분." },
+  { en: "I'm Miguel from Brazil.",
+    ko: "저는 브라질에서 온 Miguel입니다." },
+  { en: "I'm making an acai bowl right now.",
+    ko: "지금 저는 아사이 볼을 만들고 있어요." },
+  { en: "It's a thick acai berry smoothie in a bowl.",
+    ko: "그것은 걸쭉한 아사이베리 스무디를 그릇에 담은 거예요." },
+  { en: "You can add other healthy foods like nuts and bananas, and it'll taste really good.",
+    ko: "여러분은 견과류나 바나나 같은 다른 건강한 음식을 추가할 수 있는데, 그러면 그것은 정말 맛있을 거예요." },
+  { en: "Acai berries are a superfood, and people all over the world enjoy them.",
+    ko: "아사이베리는 슈퍼 푸드이고, 전 세계 사람들이 그것들을 즐겨 먹어요." },
+  { en: "You can add other healthy foods like nuts and bananas.",
+    ko: "여러분은 견과류나 바나나 같은 다른 건강한 음식을 추가할 수 있어요." },
+  { en: "Acai berries are a superfood.",
+    ko: "아사이베리는 슈퍼 푸드예요." },
+  { en: "People all over the world enjoy acai berries.",
+    ko: "전 세계 사람들이 아사이베리를 즐겨 먹어요." },
+  { en: "It'll taste really good.",
+    ko: "그것은 정말 맛있을 거예요." },
+]; // 총 30쌍
+
+// ─────────────────────────────────────────
+const ROOMS = [
+  { name: "방 1 – Bella의 카프레제 꼬치", icon: "🥗", msg: "Bella의 주방을 탈출했습니다! Mina의 주방으로 이동!" },
+  { name: "방 2 – Mina의 두부 칩",        icon: "🥢", msg: "Mina의 주방을 탈출했습니다! Miguel의 주방으로 이동!" },
+  { name: "방 3 – Miguel의 아사이 볼",    icon: "🍇", msg: "모든 주방 탈출 완료! 건강 간식 마스터!" },
+];
+
+let questions = [], current = 0, score = 0, answered = false, log = [], currentMode = 'ko';
+
+function getRoomIndex(q) { return Math.floor(q / 10); }
+
+function buildQuestions(m) {
+  const shuffled = shuffle([...ALL_PAIRS]);
+  return shuffled.map(pair => {
+    let dir;
+    if (m === 'ko')  dir = 'ko2en';
+    else if (m === 'en') dir = 'en2ko';
+    else dir = Math.random() < 0.5 ? 'ko2en' : 'en2ko';
+
+    const question = dir === 'ko2en' ? pair.ko : pair.en;
+    const answer   = dir === 'ko2en' ? pair.en : pair.ko;
+    const wrongPool = ALL_PAIRS
+      .filter(p => p !== pair)
+      .map(p => dir === 'ko2en' ? p.en : p.ko);
+    const wrongs  = shuffle(wrongPool).slice(0, 3);
+    const options = shuffle([answer, ...wrongs]);
+    return { question, answer, options, dir };
+  });
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(m) {
+  currentMode = m;
+  questions = buildQuestions(m);
+  current = 0; score = 0; log = [];
+  document.getElementById('start-screen').style.display  = 'none';
+  document.getElementById('quiz-screen').style.display   = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('room-clear').classList.remove('show');
+  updateRoomDots(0);
+  renderQuestion();
+}
+
+function renderQuestion() {
+  document.getElementById('room-clear').classList.remove('show');
+  const q = questions[current];
+  const roomIdx = getRoomIndex(current);
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+  document.getElementById('room-live').textContent = ROOMS[roomIdx].name;
+  document.getElementById('progress-bar').style.width = ((current / 30) * 100) + '%';
+  document.getElementById('q-label').textContent =
+    q.dir === 'ko2en' ? '🇰🇷 한국어 → 영어로 번역하세요' : '🇬🇧 영어 → 한국어로 번역하세요';
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('hint-icon').textContent = ['🥗','🥢','🍇'][roomIdx];
+
+  const grid = document.getElementById('option-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn, q);
+    grid.appendChild(btn);
+  });
+  document.getElementById('feedback').className = '';
+  answered = false;
+  updateRoomDots(roomIdx);
+}
+
+function selectAnswer(opt, btn, q) {
+  if (answered) return;
+  answered = true;
+  const correct = opt === q.answer;
+  if (correct) score++;
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.classList.add('correct');
+  });
+  if (!correct) btn.classList.add('wrong');
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    fb.className = 'show-correct';
+    fb.textContent = '✅ 정답! 다음 재료를 획득했습니다!';
+  } else {
+    fb.className = 'show-wrong';
+    fb.textContent = `❌ 오답! 정답: ${q.answer}`;
+  }
+  log.push({ question: q.question, answer: q.answer, chosen: opt, correct, dir: q.dir });
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+  setTimeout(() => {
+    current++;
+    if (current === 30) { showResult(); return; }
+    const prevRoom = getRoomIndex(current - 1);
+    const thisRoom = getRoomIndex(current);
+    if (thisRoom !== prevRoom) showRoomClear(prevRoom);
+    else renderQuestion();
+  }, 1400);
+}
+
+function showRoomClear(roomIdx) {
+  const r = ROOMS[roomIdx];
+  document.getElementById('unlock-icon').textContent = r.icon;
+  document.getElementById('room-clear-title').textContent = `${r.name} 탈출 성공! 🎉`;
+  document.getElementById('room-clear-msg').textContent = r.msg;
+  const nextRoom = ROOMS[roomIdx + 1];
+  if (nextRoom) document.getElementById('next-room-btn').textContent = `${nextRoom.icon} ${nextRoom.name}으로 →`;
+  document.getElementById('room-clear').classList.add('show');
+  const dot = document.getElementById(`dot-${roomIdx}`);
+  dot.classList.remove('active'); dot.classList.add('done'); dot.textContent = '✅';
+}
+
+function nextRoom() {
+  document.getElementById('room-clear').classList.remove('show');
+  renderQuestion();
+}
+
+function updateRoomDots(roomIdx) {
+  [0,1,2].forEach(i => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (i < roomIdx) { dot.classList.remove('active'); dot.classList.add('done'); dot.textContent = '✅'; }
+    else if (i === roomIdx) { dot.classList.add('active'); dot.classList.remove('done'); dot.textContent = ROOMS[i].icon; }
+    else { dot.classList.remove('active','done'); dot.textContent = ROOMS[i].icon; }
+  });
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display  = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  const pct = Math.round((score / 30) * 100);
+  document.getElementById('final-score').textContent   = score;
+  document.getElementById('final-correct').textContent = score;
+  document.getElementById('final-wrong').textContent   = 30 - score;
+  setTimeout(() => { document.getElementById('grade-bar').style.width = pct + '%'; }, 100);
+  let grade, msg, trophy;
+  if      (pct >= 97) { grade='S 🏆'; msg='완벽한 주방 마스터! 세 요리사의 레시피를 모두 외웠어요!'; trophy='🏆'; }
+  else if (pct >= 90) { grade='A 🥇'; msg='훌륭해요! 건강 간식 전문가!'; trophy='🥇'; }
+  else if (pct >= 77) { grade='B 🥈'; msg='좋아요! 조금만 더 연습하면 완벽!'; trophy='🥈'; }
+  else if (pct >= 60) { grade='C 🥉'; msg='탈출은 했지만 놓친 레시피가 있어요.'; trophy='🥉'; }
+  else                { grade='D 👨‍🍳'; msg='다시 주방으로 돌아가서 연습해봐요!'; trophy='👨‍🍳'; }
+  document.getElementById('trophy').textContent = trophy;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-msg').textContent = `${pct}점 (${msg})`;
+  const logDiv = document.getElementById('answer-log');
+  const wrongs = log.filter(l => !l.correct);
+  if (wrongs.length === 0) {
+    logDiv.innerHTML = '<p style="color:#2ecc71;text-align:center;">🎉 오답이 없습니다! 만점!</p>';
+  } else {
+    logDiv.innerHTML = wrongs.map(l => `
+      <div class="log-item fail">
+        <div class="log-q">${l.dir==='ko2en'?'🇰🇷':'🇬🇧'} ${l.question}</div>
+        <div class="log-a">내 답: <span class="wrong-ans">${l.chosen}</span></div>
+        <div class="log-a">정답: <span>${l.answer}</span></div>
+      </div>`).join('');
+  }
+}
+
+function retryMode() { startQuiz(currentMode); }
+function goHome() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display  = 'block';
+}
+</script>
+</body>
+</html>
