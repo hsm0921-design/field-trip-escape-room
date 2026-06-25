@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중1 영어 5과 방탈출 – Who Threw a Cake at the Monalisa?</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #1a1a2e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #e0e0e0;
+}
+
+/* ── HEADER ── */
+header {
+  width: 100%;
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  text-align: center;
+  padding: 20px 10px 16px;
+  border-bottom: 2px solid #e94560;
+  position: relative;
+}
+header h1 { font-size: 1.3rem; font-weight: 700; color: #f5c518; letter-spacing: 1px; }
+header p  { font-size: 0.85rem; margin-top: 4px; color: #aaa; }
+
+/* ── SCREENS ── */
+#start-screen, #quiz-screen, #result-screen {
+  width: 100%;
+  max-width: 800px;
+  padding: 30px 20px;
+}
+
+/* ── START ── */
+#start-screen { text-align: center; }
+.story-box {
+  background: #16213e;
+  border: 1px solid #e94560;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  text-align: left;
+  line-height: 1.7;
+  color: #ccc;
+  font-size: 0.92rem;
+}
+.story-box h2 { color: #f5c518; font-size: 1.1rem; margin-bottom: 8px; }
+.room-map {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.room-card {
+  background: #16213e;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 14px 18px;
+  text-align: center;
+  width: 160px;
+}
+.room-card .room-icon { font-size: 2rem; }
+.room-card .room-name { font-size: 0.82rem; color: #aaa; margin-top: 4px; }
+.room-card .room-num  { font-size: 1rem; color: #f5c518; font-weight: 700; }
+.mode-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.mode-btn {
+  padding: 14px 28px;
+  border: none; border-radius: 12px;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: transform .15s, box-shadow .15s;
+}
+.mode-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+.mode-ko  { background: #0f3460; color: #f5c518; border: 1px solid #e94560; }
+.mode-en  { background: #e94560; color: white; }
+.mode-mix { background: #f5c518; color: #1a1a2e; }
+
+/* ── ROOM INDICATOR ── */
+.room-indicator {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.room-dot {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 2px solid #555;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  background: #16213e;
+  transition: all .3s;
+}
+.room-dot.active { border-color: #e94560; background: #e94560; }
+.room-dot.done   { border-color: #2ecc71; background: #2ecc71; }
+
+/* ── PROGRESS ── */
+#progress-bar-wrap {
+  background: #16213e;
+  border-radius: 8px;
+  height: 8px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+#progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #e94560, #f5c518);
+  border-radius: 8px;
+  transition: width .4s;
+}
+#q-meta { display: flex; justify-content: space-between; color: #888; font-size: .82rem; margin-bottom: 10px; }
+#score-live { font-weight: 700; color: #f5c518; }
+#room-live  { font-weight: 700; color: #e94560; }
+
+/* ── QUESTION BOX ── */
+#question-box {
+  background: #16213e;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  margin-bottom: 20px;
+  border: 1px solid #2a2a4a;
+  position: relative;
+}
+#q-label {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #e94560;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+#q-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #f0f0f0;
+  min-height: 60px;
+}
+.hint-icon {
+  position: absolute;
+  top: 14px; right: 18px;
+  font-size: 1.3rem;
+  opacity: 0.5;
+}
+
+/* ── OPTIONS ── */
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 520px) { .option-grid { grid-template-columns: 1fr; } }
+.opt-btn {
+  padding: 14px 16px;
+  border: 2px solid #2a2a4a;
+  border-radius: 12px;
+  background: #16213e;
+  color: #ddd;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .18s;
+  text-align: left;
+  line-height: 1.45;
+}
+.opt-btn:hover:not(:disabled)  { border-color: #e94560; background: #1e2a4a; color: white; }
+.opt-btn.correct { border-color: #2ecc71; background: #1a4a2e; color: #2ecc71; }
+.opt-btn.wrong   { border-color: #e74c3c; background: #4a1a1a; color: #e74c3c; }
+
+/* ── FEEDBACK ── */
+#feedback {
+  text-align: center;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: none;
+  margin-bottom: 14px;
+}
+#feedback.show-correct { display: block; background: #1a4a2e; color: #2ecc71; border: 1px solid #2ecc71; }
+#feedback.show-wrong   { display: block; background: #4a1a1a; color: #e74c3c; border: 1px solid #e74c3c; }
+
+/* ── ROOM CLEAR ── */
+#room-clear {
+  display: none;
+  text-align: center;
+  background: #16213e;
+  border: 2px solid #f5c518;
+  border-radius: 16px;
+  padding: 32px 24px;
+  animation: popIn .4s ease;
+}
+#room-clear.show { display: block; }
+@keyframes popIn { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.unlock-icon { font-size: 4rem; }
+#room-clear h2 { color: #f5c518; font-size: 1.4rem; margin: 12px 0 8px; }
+#room-clear p  { color: #aaa; margin-bottom: 20px; }
+.next-room-btn {
+  padding: 12px 30px;
+  background: #f5c518; color: #1a1a2e;
+  border: none; border-radius: 10px;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer;
+  transition: transform .15s;
+}
+.next-room-btn:hover { transform: translateY(-2px); }
+
+/* ── RESULT ── */
+#result-screen { text-align: center; display: none; }
+.result-box {
+  background: #16213e;
+  border: 2px solid #f5c518;
+  border-radius: 18px;
+  padding: 36px 28px;
+  margin-bottom: 20px;
+}
+.trophy { font-size: 4.5rem; }
+.result-box h2 { color: #f5c518; font-size: 1.5rem; margin: 14px 0 8px; }
+.score-big { font-size: 2.8rem; font-weight: 700; color: white; }
+.score-sub { color: #aaa; font-size: .9rem; margin-top: 4px; }
+.grade-bar-wrap { margin: 20px 0; background: #0a0a1e; border-radius: 8px; height: 14px; overflow: hidden; }
+.grade-bar { height: 100%; background: linear-gradient(90deg,#e94560,#f5c518); border-radius: 8px; transition: width 1s ease; }
+.result-grade { font-size: 1.6rem; font-weight: 700; color: #f5c518; margin: 10px 0 4px; }
+.result-msg   { color: #bbb; font-size: .92rem; margin-bottom: 24px; }
+.result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.result-btn {
+  padding: 12px 26px;
+  border-radius: 10px;
+  border: none;
+  font-size: .95rem; font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s;
+}
+.result-btn:hover { transform: translateY(-2px); }
+.btn-retry  { background: #e94560; color: white; }
+.btn-home   { background: #0f3460; color: #f5c518; border: 1px solid #e94560; }
+.btn-mode   { background: #f5c518; color: #1a1a2e; }
+
+/* ── ANSWER LOG ── */
+.log-section { margin-top: 20px; text-align: left; }
+.log-section h3 { color: #f5c518; margin-bottom: 12px; font-size: 1rem; }
+.log-item {
+  background: #16213e;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-left: 4px solid;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+.log-item.ok   { border-color: #2ecc71; }
+.log-item.fail { border-color: #e74c3c; }
+.log-q { color: #ccc; }
+.log-a { color: #aaa; margin-top: 3px; }
+.log-a span { color: #2ecc71; font-weight: 600; }
+.log-a .wrong-ans { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔐 중1 영어 5과 방탈출 퀴즈</h1>
+  <p>Think like Sherlock Holmes! – Who Threw a Cake at the Monalisa?</p>
+</header>
+
+<!-- ─── START SCREEN ─── -->
+<div id="start-screen">
+  <div class="story-box">
+    <h2>🕵️ 미션 브리핑</h2>
+    <p>
+      보고타의 보테로 박물관에서 <strong>모나리자</strong>에 케이크를 던진 범인을 잡아라!<br>
+      목격자 4명의 진술을 정확히 해석해야 방에서 탈출할 수 있다.<br><br>
+      <strong>총 3개의 방</strong>을 탈출하면 수사 완료! 각 방마다 10문제가 주어진다.
+    </p>
+  </div>
+
+  <div class="room-map">
+    <div class="room-card"><div class="room-icon">🚪</div><div class="room-num">방 1</div><div class="room-name">현장 진입 (1~10번)</div></div>
+    <div class="room-card"><div class="room-icon">🔒</div><div class="room-num">방 2</div><div class="room-name">증거 수집 (11~20번)</div></div>
+    <div class="room-card"><div class="room-icon">🔐</div><div class="room-num">방 3</div><div class="room-name">범인 확정 (21~30번)</div></div>
+  </div>
+
+  <div class="mode-btns">
+    <button class="mode-btn mode-ko"  onclick="startQuiz('ko')">🇰🇷 한→영 모드<br><small style="font-weight:400">Korean → English</small></button>
+    <button class="mode-btn mode-en"  onclick="startQuiz('en')">🇬🇧 영→한 모드<br><small style="font-weight:400">English → Korean</small></button>
+    <button class="mode-btn mode-mix" onclick="startQuiz('mix')">🎲 랜덤 모드<br><small style="font-weight:400">Mixed</small></button>
+  </div>
+</div>
+
+<!-- ─── QUIZ SCREEN ─── -->
+<div id="quiz-screen" style="display:none">
+  <div class="room-indicator">
+    <div class="room-dot" id="dot-0">🚪</div>
+    <div class="room-dot" id="dot-1">🔒</div>
+    <div class="room-dot" id="dot-2">🔐</div>
+  </div>
+
+  <div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+  <div id="q-meta">
+    <span id="room-live">방 1 진행 중</span>
+    <span>문제 <span id="q-num">1</span>/30</span>
+    <span id="score-live">점수: 0</span>
+  </div>
+
+  <div id="question-box">
+    <div id="q-label">다음을 번역하세요</div>
+    <div class="hint-icon" id="hint-icon">🔍</div>
+    <div id="q-text"></div>
+  </div>
+
+  <div class="option-grid" id="option-grid"></div>
+  <div id="feedback"></div>
+
+  <!-- 방 탈출 화면 -->
+  <div id="room-clear">
+    <div class="unlock-icon" id="unlock-icon">🔓</div>
+    <h2 id="room-clear-title">방 1 탈출 성공!</h2>
+    <p id="room-clear-msg">수사가 진행 중입니다...</p>
+    <button class="next-room-btn" id="next-room-btn" onclick="nextRoom()">다음 방으로 →</button>
+  </div>
+</div>
+
+<!-- ─── RESULT SCREEN ─── -->
+<div id="result-screen">
+  <div class="result-box">
+    <div class="trophy" id="trophy">🏆</div>
+    <h2>수사 완료!</h2>
+    <div class="score-big"><span id="final-score">0</span> / 30</div>
+    <div class="score-sub">정답 <span id="final-correct">0</span>개 · 오답 <span id="final-wrong">0</span>개</div>
+    <div class="grade-bar-wrap"><div class="grade-bar" id="grade-bar" style="width:0%"></div></div>
+    <div class="result-grade" id="result-grade">?</div>
+    <div class="result-msg"  id="result-msg">결과를 분석 중...</div>
+  </div>
+
+  <div class="result-btns">
+    <button class="result-btn btn-retry" onclick="retryMode()">🔄 다시 도전</button>
+    <button class="result-btn btn-home"  onclick="goHome()">🏠 처음으로</button>
+    <button class="result-btn btn-mode"  onclick="goHome()">🎯 모드 선택</button>
+  </div>
+
+  <div class="log-section">
+    <h3>📋 오답 노트</h3>
+    <div id="answer-log"></div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// 문장 데이터 (영어 ↔ 한국어)
+// ──────────────────────────────────────────────
+// 본문 문장 30쌍 (이름/짧은 구 제외, 고유 문장만)
+const ALL_PAIRS = [
+  // ── 도입부 ──
+  { en: "Last Saturday, someone threw a cake at the Monalisa in the Botero Museum in Bogota, Colombia.",
+    ko: "지난 토요일, 누군가가 콜롬비아 보고타에 있는 보테로 박물관의 모나리자에 케이크를 던졌다." },
+  { en: "There were four eyewitnesses.",
+    ko: "목격자가 네 명 있었다." },
+  { en: "What did they say?",
+    ko: "그들은 무슨 말을 했는가?" },
+  { en: "Read the following, and find the criminal.",
+    ko: "다음을 읽고, 범인을 찾아라." },
+
+  // ── Ann Jones (방문객) ──
+  { en: "I was looking at the Monalisa, and someone threw a cake at the painting.",
+    ko: "나는 모나리자를 보고 있었는데, 누군가가 그림에 케이크를 던졌다." },
+  { en: "I turned around and saw an old man.",
+    ko: "나는 돌아서서 한 노인을 보았다." },
+  { en: "He was standing in front of a wheelchair.",
+    ko: "그는 휠체어 앞에 서 있었다." },
+  { en: "I'm about 170 cm tall, and he was a little taller than me.",
+    ko: "나는 키가 약 170cm이고, 그는 나보다 약간 더 컸다." },
+
+  // ── Carlos Diaz (청소부) ──
+  { en: "An old man with gray hair was running away, and something fell off his head.",
+    ko: "회색 머리의 노인이 도망치고 있었고, 무언가가 그의 머리에서 떨어졌다." },
+  { en: "It was his wig.",
+    ko: "그것은 그의 가발이었다." },
+  { en: "I ran after him, but I couldn't catch him.",
+    ko: "나는 그를 뒤쫓았지만, 잡을 수 없었다." },
+  { en: "He was faster than me.",
+    ko: "그는 나보다 빨랐다." },
+  { en: "In fact, the old man was not old.",
+    ko: "사실, 그 노인은 늙지 않았다." },
+  { en: "He was a young man with long brown hair.",
+    ko: "그는 긴 갈색 머리를 가진 젊은 남자였다." },
+
+  // ── Diego Perez (경비원) ──
+  { en: "I went to the crime scene, and I saw the criminal running away.",
+    ko: "나는 범죄 현장에 갔고, 범인이 도망치는 것을 보았다." },
+  { en: "I ran after him and found something in his coat.",
+    ko: "나는 그를 뒤쫓아 그의 코트에서 무언가를 찾았다." },
+  { en: "It was a wallet.",
+    ko: "그것은 지갑이었다." },
+
+  // ── Camila Santos (목격자) ──
+  { en: "In the museum, a man gave me a wallet.",
+    ko: "박물관에서, 한 남자가 내게 지갑을 주었다." },
+  { en: "I tried to look at his face, but he left right away.",
+    ko: "나는 그의 얼굴을 보려고 했지만, 그는 바로 떠났다." },
+  { en: "He left in a hurry.",
+    ko: "그는 서둘러 떠났다." },
+  { en: "Later, when I opened the wallet, something was in it.",
+    ko: "나중에, 지갑을 열었을 때, 그 안에 무언가가 있었다." },
+  { en: "There was a note with a name and an address.",
+    ko: "이름과 주소가 적힌 쪽지가 있었다." },
+
+  // ── 핵심 문장 추가 (총 30개 구성) ──
+  { en: "Someone threw a cake at the painting.",
+    ko: "누군가가 그림에 케이크를 던졌다." },
+  { en: "He was wearing a gray wig.",
+    ko: "그는 회색 가발을 쓰고 있었다." },
+  { en: "The man ran away quickly.",
+    ko: "그 남자는 빠르게 달아났다." },
+  { en: "He looked like an old man, but he was young.",
+    ko: "그는 노인처럼 보였지만, 젊었다." },
+  { en: "I saw him running away from the museum.",
+    ko: "나는 그가 박물관에서 도망치는 것을 보았다." },
+  { en: "I couldn't see his face clearly.",
+    ko: "나는 그의 얼굴을 똑똑히 볼 수 없었다." },
+  { en: "The wallet had important information.",
+    ko: "지갑에는 중요한 정보가 들어 있었다." },
+  { en: "He was standing near the famous painting.",
+    ko: "그는 유명한 그림 근처에 서 있었다." },
+]; // 총 30쌍
+
+// ──────────────────────────────────────────────
+// 게임 상태
+// ──────────────────────────────────────────────
+let mode = 'ko';
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+let log = [];
+let currentMode = 'ko';
+
+const ROOMS = [
+  { name: "방 1 – 현장 진입",   icon: "🚪", msg: "박물관 안으로 진입했습니다!" },
+  { name: "방 2 – 증거 수집",   icon: "🔓", msg: "핵심 증거를 확보했습니다!" },
+  { name: "방 3 – 범인 확정",   icon: "🏆", msg: "범인을 특정했습니다!" },
+];
+
+function getRoomIndex(q) { return Math.floor(q / 10); }
+
+// ──────────────────────────────────────────────
+// 퀴즈 생성
+// ──────────────────────────────────────────────
+function buildQuestions(m) {
+  const shuffled = shuffle([...ALL_PAIRS]);
+  return shuffled.map(pair => {
+    let dir;
+    if (m === 'ko')  dir = 'ko2en';
+    else if (m === 'en') dir = 'en2ko';
+    else dir = Math.random() < 0.5 ? 'ko2en' : 'en2ko';
+
+    const question = dir === 'ko2en' ? pair.ko : pair.en;
+    const answer   = dir === 'ko2en' ? pair.en : pair.ko;
+
+    const wrongPool = ALL_PAIRS
+      .filter(p => p !== pair)
+      .map(p => dir === 'ko2en' ? p.en : p.ko);
+    const wrongs = shuffle(wrongPool).slice(0, 3);
+    const options = shuffle([answer, ...wrongs]);
+
+    return { question, answer, options, dir };
+  });
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ──────────────────────────────────────────────
+// 시작
+// ──────────────────────────────────────────────
+function startQuiz(m) {
+  currentMode = m;
+  mode = m;
+  questions = buildQuestions(m);
+  current = 0;
+  score = 0;
+  log = [];
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display  = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('room-clear').classList.remove('show');
+
+  updateRoomDots(0);
+  renderQuestion();
+}
+
+// ──────────────────────────────────────────────
+// 문제 렌더링
+// ──────────────────────────────────────────────
+function renderQuestion() {
+  document.getElementById('room-clear').classList.remove('show');
+
+  const q = questions[current];
+  const roomIdx = getRoomIndex(current);
+
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+  document.getElementById('room-live').textContent = ROOMS[roomIdx].name;
+  document.getElementById('progress-bar').style.width = ((current / 30) * 100) + '%';
+
+  const label = q.dir === 'ko2en' ? '🇰🇷 한국어 → 영어로 번역하세요' : '🇬🇧 영어 → 한국어로 번역하세요';
+  document.getElementById('q-label').textContent = label;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('hint-icon').textContent = q.dir === 'ko2en' ? '🔍' : '📖';
+
+  const grid = document.getElementById('option-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn, q);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('feedback').className = '';
+  document.getElementById('feedback').textContent = '';
+  answered = false;
+  updateRoomDots(roomIdx);
+}
+
+// ──────────────────────────────────────────────
+// 답 선택
+// ──────────────────────────────────────────────
+function selectAnswer(opt, btn, q) {
+  if (answered) return;
+  answered = true;
+
+  const correct = opt === q.answer;
+  if (correct) score++;
+
+  // 색상 피드백
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.classList.add('correct');
+  });
+  if (!correct) btn.classList.add('wrong');
+
+  // 텍스트 피드백
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    fb.className = 'show-correct';
+    fb.textContent = '✅ 정답! 단서를 확보했습니다!';
+  } else {
+    fb.className = 'show-wrong';
+    fb.textContent = `❌ 오답! 정답: ${q.answer}`;
+  }
+
+  log.push({ question: q.question, answer: q.answer, chosen: opt, correct, dir: q.dir });
+
+  document.getElementById('score-live').textContent = `점수: ${score}`;
+
+  setTimeout(() => {
+    current++;
+    const prevRoom = getRoomIndex(current - 1);
+    const thisRoom = getRoomIndex(current);
+
+    if (current === 30) {
+      showResult();
+    } else if (thisRoom !== prevRoom) {
+      showRoomClear(prevRoom);
+    } else {
+      renderQuestion();
+    }
+  }, 1400);
+}
+
+// ──────────────────────────────────────────────
+// 방 탈출 화면
+// ──────────────────────────────────────────────
+function showRoomClear(roomIdx) {
+  const r = ROOMS[roomIdx];
+  document.getElementById('unlock-icon').textContent = r.icon;
+  document.getElementById('room-clear-title').textContent = `${r.name} 탈출 성공! 🎉`;
+  document.getElementById('room-clear-msg').textContent = r.msg;
+
+  const nextRoom = ROOMS[roomIdx + 1];
+  const btn = document.getElementById('next-room-btn');
+  if (nextRoom) {
+    btn.textContent = `${nextRoom.icon} ${nextRoom.name}으로 →`;
+  }
+
+  document.getElementById('room-clear').classList.add('show');
+
+  // 방 점 업데이트
+  const dot = document.getElementById(`dot-${roomIdx}`);
+  dot.classList.remove('active');
+  dot.classList.add('done');
+  dot.textContent = '✅';
+}
+
+function nextRoom() {
+  document.getElementById('room-clear').classList.remove('show');
+  renderQuestion();
+}
+
+function updateRoomDots(roomIdx) {
+  [0,1,2].forEach(i => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (i < roomIdx) {
+      dot.classList.remove('active');
+      dot.classList.add('done');
+      dot.textContent = '✅';
+    } else if (i === roomIdx) {
+      dot.classList.add('active');
+      dot.classList.remove('done');
+      dot.textContent = ROOMS[i].icon.replace('🔒','🔓').replace('🔐','🔓');
+    } else {
+      dot.classList.remove('active', 'done');
+      dot.textContent = ROOMS[i].icon;
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
+// 결과 화면
+// ──────────────────────────────────────────────
+function showResult() {
+  document.getElementById('quiz-screen').style.display  = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+
+  const pct = Math.round((score / 30) * 100);
+  document.getElementById('final-score').textContent   = score;
+  document.getElementById('final-correct').textContent = score;
+  document.getElementById('final-wrong').textContent   = 30 - score;
+
+  setTimeout(() => {
+    document.getElementById('grade-bar').style.width = pct + '%';
+  }, 100);
+
+  let grade, msg, trophy;
+  if (pct >= 97) { grade = 'S 🏆'; msg = '완벽한 수사! 당신은 진정한 셜록 홈즈!'; trophy = '🏆'; }
+  else if (pct >= 90) { grade = 'A 🥇'; msg = '훌륭한 수사 능력! 거의 완벽합니다!'; trophy = '🥇'; }
+  else if (pct >= 77) { grade = 'B 🥈'; msg = '좋은 수사 실력! 조금만 더 연습하면 완벽!'; trophy = '🥈'; }
+  else if (pct >= 60) { grade = 'C 🥉'; msg = '수사에 성공했지만 놓친 단서가 있습니다.'; trophy = '🥉'; }
+  else { grade = 'D 🔍'; msg = '범인을 놓쳤습니다... 다시 수사를 시작하세요!'; trophy = '🔍'; }
+
+  document.getElementById('trophy').textContent = trophy;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-msg').textContent = `${pct}점 (${msg})`;
+
+  // 오답 노트
+  const logDiv = document.getElementById('answer-log');
+  const wrongs = log.filter(l => !l.correct);
+  if (wrongs.length === 0) {
+    logDiv.innerHTML = '<p style="color:#2ecc71;text-align:center;">🎉 오답이 없습니다! 만점입니다!</p>';
+  } else {
+    logDiv.innerHTML = wrongs.map(l => `
+      <div class="log-item fail">
+        <div class="log-q">❓ ${l.dir === 'ko2en' ? '🇰🇷' : '🇬🇧'} ${l.question}</div>
+        <div class="log-a">내 답: <span class="wrong-ans">${l.chosen}</span></div>
+        <div class="log-a">정답: <span>${l.answer}</span></div>
+      </div>
+    `).join('');
+  }
+}
+
+function retryMode() { startQuiz(currentMode); }
+function goHome() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display  = 'block';
+}
+</script>
+</body>
+</html>
